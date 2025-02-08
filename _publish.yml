@@ -1,0 +1,4 @@
+- source: project
+  netlify:
+    - id: f8b19dc3-bd16-436b-b301-26c10ffbdbe2
+      url: 'https://isusportsanalytics.netlify.app/'

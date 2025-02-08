@@ -1,0 +1,25 @@
+project:
+  type: book
+
+book:
+  title: "Sports Analytics"
+  author: "Jarad Niemi"
+  date: "2025-02-28"
+  chapters:
+    - index.qmd
+    - intro.qmd
+    - summary.qmd
+    - references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+
+execute:
+  freeze: auto
+  
