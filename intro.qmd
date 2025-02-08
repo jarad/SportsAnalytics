@@ -1,5 +1,5 @@
 # Introduction
 
-This is a book created from markdown and executable code.
-
-See @knuth84 for additional discussion of literate programming.
+This is a book for STAT 4610X - Sports Analytics at Iowa State University. 
+The course expects students to have had a previous statistics course that 
+covers multiple regression. 
