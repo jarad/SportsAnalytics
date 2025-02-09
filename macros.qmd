@@ -1,0 +1,9 @@
+---
+format: html
+---
+
+::: {.hidden}
+$$
+\newcommand{\ind}{\stackrel{ind}{\sim}}
+$$
+:::
