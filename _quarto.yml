@@ -17,9 +17,7 @@ bibliography: references.bib
 
 format:
   html:
-    theme: cosmo      
-    include-in-header:
-      - file: macros.html
+    theme: cosmo
 
 
 execute:

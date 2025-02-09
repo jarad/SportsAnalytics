@@ -18,11 +18,11 @@ For observation $i = \{1,2,\ldots,n\}$, let
 
 The simple linear regression model (SLR) assumes
 $$ 
-Y_i \ind N(\beta_0 + \beta_1 X_i, \sigma^2)
+Y_i \stackrel{ind}{\sim} N(\beta_0 + \beta_1 X_i, \sigma^2)
 $$
 or, equivalently,
 $$ 
-Y_i = \beta_0 + \beta_1 X_i + \epsilon_i, \quad \epsilon_i \ind N(0, \sigma^2).
+Y_i = \beta_0 + \beta_1 X_i + \epsilon_i, \quad \epsilon_i \stackrel{ind}{\sim} N(0, \sigma^2).
 $$
 
 ### Interpretation
@@ -44,7 +44,7 @@ Thus,
 
 Recall
 $$ 
-E[Y_i] = \beta_0 + \beta_1 X_i, \quad \epsilon_i \ind N(0, \sigma^2)
+E[Y_i] = \beta_0 + \beta_1 X_i, \quad \epsilon_i \stackrel{ind}{\sim} N(0, \sigma^2)
 $$
 
 Thus, the model assumptions are 
