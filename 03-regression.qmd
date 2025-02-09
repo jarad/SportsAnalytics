@@ -1,0 +1,113 @@
+# Regression
+
+Stub for regression content
+
+```{r packages}
+library("tidyverse"); theme_set(theme_bw())
+library("ggResidpanel")
+```
+
+## Simple Linear Regression
+
+### Model
+
+For observation $i = \{1,2,\ldots,n\}$, let
+
+- $Y_i$ be the response variable and
+- $X_i$ be the explanatory variable.
+
+The simple linear regression model (SLR) assumes
+$$ 
+Y_i \ind N(\beta_0 + \beta_1 X_i, \sigma^2)
+$$
+or, equivalently,
+$$ 
+Y_i = \beta_0 + \beta_1 X_i + \epsilon_i, \quad \epsilon_i \ind N(0, \sigma^2).
+$$
+
+### Interpretation
+
+Recall
+$$ 
+E[Y_i] = \beta_0 + \beta_1 X_i
+$$
+
+Thus,
+
+- $\beta_0$ is the expected response when $X_i=0$ \pause
+- $\beta_1$ is the expected increase in the response when $X_i$ is increased by 1.
+
+
+
+
+### Assumptions
+
+Recall
+$$ 
+E[Y_i] = \beta_0 + \beta_1 X_i, \quad \epsilon_i \ind N(0, \sigma^2)
+$$
+
+Thus, the model assumptions are 
+
+- The errors are independent.
+- The errors are normally distributed.
+- The errors have constant variance.
+- The relationship between the expected response and the explanatory variable
+is a straight line. 
+
+
+
+### Diagnostics
+
+```{r slr-diagnostics}
+m <- lm(Sepal.Length ~ Sepal.Width, data = iris)
+ggResidpanel::resid_panel(m, 
+                          plots = c("resid", "qq", "cookd"), 
+                          qqbands = TRUE, 
+                          nrow = 1)
+```
+
+### Triathlon Data
+
+```{r triathlon-data-read}
+d <- read_csv("data/ironman_lake_placid_female_2022_canadian.csv")
+head(d)
+```
+
+```{r triathlon-data-plot}
+ggplot(d |> filter(Swim.Time < 500), 
+       aes(x = Swim.Time, y = Bike.Time)) + 
+  geom_point()
+```
+
+```{r triathlon-model-diagnostics}
+m <- lm(Bike.Time ~ Swim.Time, data = d |> filter(Swim.Time < 500))
+ggResidpanel::resid_panel(m, plots = c("resid", "qq", "cookd"), qqbands = TRUE, nrow = 1)
+```
+
+```{r triathlon-model-summary}
+summary(m)
+```
+
+```{r triathlon-model-interpretation}
+cbind(coef(m), confint(m))
+summary(m)$r.squared
+```
+
+When swim time is 0, the expected Bike Time is 
+`r round(coef(m)[1])` mins with a 95\% interval of 
+(`r round(confint(m)[1,1])`, `r round(confint(m)[1,2])`).
+For additional minute of swim time, 
+the bike time is expected to increase 
+`r round(coef(m)[2],1)` mins  
+(`r round(confint(m)[2,1],1)`, `r round(confint(m)[2,2],1)`).
+The model explains 
+`r round(100*summary(m)$r.squared)`\% of the variability
+in bike time.
+
+### Two-sample T-test
+
+
+
+## Multiple Linear Regression
+

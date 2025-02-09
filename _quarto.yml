@@ -7,7 +7,9 @@ book:
   date: "2025-02-28"
   chapters:
     - index.qmd
-    - intro.qmd
+    - 01-intro.qmd
+    - 02-distributions.qmd
+    - 03-regression.qmd
     - summary.qmd
     - references.qmd
 
@@ -15,7 +17,9 @@ bibliography: references.bib
 
 format:
   html:
-    theme: cosmo
+    theme: cosmo      
+    include-in-header:
+      - file: macros.html
 
 
 execute:

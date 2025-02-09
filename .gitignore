@@ -48,5 +48,9 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
+# Quarto auxiliary files/folders
 /.quarto/
 /_book/
+
+# Mac files
+.DS_Store
