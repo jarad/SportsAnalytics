@@ -15,7 +15,7 @@ $X_{i,1}, \ldots, X_{i,p}$.
 
 Then a Poisson regression model is 
 $$
-Y_i \ind Po(\lambda_i) 
+Y_i \stackrel{ind}{\sim} Po(\lambda_i) 
 $$
 and
 $$
@@ -34,29 +34,24 @@ $$
 E[Y_i|X_{i,1}=0, \ldots,X_{i,p}=0]  = \lambda_i  = e^{\beta_0}
 $$
 
-thus $\beta_0$ determines the \alert{expected response when all explanatory
-variables are zero}.
+thus $\beta_0$ determines the **expected response when all explanatory variables are zero**.
 
 More generally, 
 $$ 
 E[Y_i|X_{i,1}=x_1, \ldots,X_{i,p}=x_p] 
- 
 = e^{\beta_0+\beta_1x_1+\cdots+\beta_px_p}.
 $$
 
 If $X_{i,1}$  increases by one unit, we have 
 $$ 
 E[Y_i|X_{i,1}=x_1+1, \ldots,X_{i,p}=x_p] 
- 
 = e^{\beta_0+\beta_1(x_1+1)+\cdots+\beta_px_p}
-
 = e^{\beta_0+\beta_1x_1+\cdots+\beta_px_p}e^{\beta_1}
 $$
 
 Thus 
 $$
-\frac{E[Y_i|X_{i,1}=x_1+1, \ldots,X_{i,p}=x_p]}{E[Y_i|X_{i,1}=x_1\phantom{+1}, \ldots,X_{i,p}=x_p]} 
- 
+\frac{E[Y_i|X_{i,1}=x_1+1, \ldots,X_{i,p}=x_p]}{E[Y_i|X_{i,1}=x_1\phantom{+1}\,, \ldots,X_{i,p}=x_p]} 
 = e^{\beta_1}.
 $$
 
@@ -67,10 +62,21 @@ other explanatory variables constant.
 ## Assumptions
 
 - Independent observations
-- Expected response 
+- Expected response relationship to the explanatory variables is defined by the model
 
 ## Diagnostics
 
+Diagnostics in Poisson regression models is much harder because we don't have 
+the same idea of residuals as we had for linear regression models. 
+We can compute some residuals:
+$$
+r_i = Y_i - \hat{Y}_i = Y_i - \lambda_i
+$$
+but these residuals each have a different variance. 
+Thus, we need to standardize by calculating the *Pearson residual*
+$$
+r_i^P =  \frac{Y_i - \lambda_i}{\sqrt{\lambda_i}}
+$$
 
 
 ## Superbowl scores
@@ -117,6 +123,13 @@ m <- glm(winning_points ~ DATE,
 
 m
 ```
+
+```{r diagnostics}
+ggResidpanel::resid_panel(m,
+                          qqbands = TRUE,
+                          smoother = TRUE)
+```
+
 
 ```{r superbowl-winning-point-poisson-regression-summary}
 summary(m)
