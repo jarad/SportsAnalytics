@@ -2,6 +2,7 @@
 
 ## 2025-02-11
 
+- Website https://isusportsanalytics.netlify.app/
 - Homework due on Thursday
 - Discussion post due on Friday
   - Stricter grading
