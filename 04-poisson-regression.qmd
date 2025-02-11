@@ -1,382 +1,80 @@
-# Regression
+# Poisson Regression
 
-Stub for regression content
+Stub for Poisson regression content
 
 ```{r packages}
 library("tidyverse"); theme_set(theme_bw())
 library("ggResidpanel")
 ```
 
-## Simple Linear Regression
+## Model
 
-### Model
+Let $Y_i\in\{0,1,2,\ldots\}$ be a count (typically over some amount of time
+or some amount of space) with associated explanatory variables 
+$X_{i,1}, \ldots, X_{i,p}$.
 
-For observation $i = \{1,2,\ldots,n\}$, let
+\vspace{0.1in} \pause
 
-- $Y_i$ be the response variable and
-- $X_i$ be the explanatory variable.
-
-The simple linear regression model (SLR) assumes
-$$ 
-Y_i \stackrel{ind}{\sim} N(\beta_0 + \beta_1 X_i, \sigma^2)
-$$
-or, equivalently,
-$$ 
-Y_i = \beta_0 + \beta_1 X_i + \epsilon_i, \quad \epsilon_i \stackrel{ind}{\sim} N(0, \sigma^2).
-$$
-
-### Interpretation
-
-Recall
-$$ 
-E[Y_i] = \beta_0 + \beta_1 X_i
-$$
-
-Thus,
-
-- $\beta_0$ is the expected response when $X_i=0$ 
-- $\beta_1$ is the expected increase in the response when $X_i$ is increased by 1.
-
-
-
-
-### Assumptions
-
-Recall
-$$ 
-E[Y_i] = \beta_0 + \beta_1 X_i, \quad \epsilon_i \stackrel{ind}{\sim} N(0, \sigma^2)
-$$
-
-Thus, the model assumptions are 
-
-- The errors are independent.
-- The errors are normally distributed.
-- The errors have constant variance.
-- The relationship between the expected response and the explanatory variable
-is a straight line. 
-
-
-
-### Diagnostics
-
-```{r slr-diagnostics}
-m <- lm(Sepal.Length ~ Sepal.Width, data = iris)
-ggResidpanel::resid_panel(m, 
-                          plots = c("resid", "qq", "cookd"), 
-                          qqbands = TRUE, 
-                          nrow = 1)
-```
-
-### Triathlon Data
-
-```{r triathlon-data-read}
-d <- read_csv("data/ironman_lake_placid_female_2022_canadian.csv")
-head(d)
-```
-
-```{r triathlon-data-plot}
-ggplot(d |> filter(Swim.Time < 500), 
-       aes(x = Swim.Time, y = Bike.Time)) + 
-  geom_point()
-```
-
-```{r triathlon-model-diagnostics}
-m <- lm(Bike.Time ~ Swim.Time, data = d |> filter(Swim.Time < 500))
-ggResidpanel::resid_panel(m, plots = c("resid", "qq", "cookd"), qqbands = TRUE, nrow = 1)
-```
-
-```{r triathlon-model-summary}
-summary(m)
-```
-
-```{r triathlon-model-interpretation}
-cbind(coef(m), confint(m))
-summary(m)$r.squared
-```
-
-When swim time is 0, the expected Bike Time is 
-`r round(coef(m)[1])` mins with a 95\% interval of 
-(`r round(confint(m)[1,1])`, `r round(confint(m)[1,2])`).
-For additional minute of swim time, 
-the bike time is expected to increase 
-`r round(coef(m)[2],1)` mins  
-(`r round(confint(m)[2,1],1)`, `r round(confint(m)[2,2],1)`).
-The model explains 
-`r round(100*summary(m)$r.squared)`\% of the variability
-in bike time.
-
-```{r triathlon-slr-plot}
-ggplot(d |> filter(Swim.Time < 500), 
-       aes(x = Swim.Time, y = Bike.Time)) + 
-  geom_point() + geom_smooth(method = "lm")
-```
-
-### Two-sample T-test
-
-We can use SLR to compare two groups. 
-
-Note that 
-$$ 
-Y_i \stackrel{ind}{\sim} N(\mu_{g[i]}, \sigma^2) 
-$$
-where $g[i] \in \{1,2\}$ determines the group membership for observation $i$
-
-is equivalent to 
-$$ 
-Y_i \stackrel{ind}{\sim} N(\beta_0 + \beta_1 \mathrm{I}(g[i] = 2), \sigma^2) 
-$$
-where $\mathrm{I}(g[i] = 2)$ is the indicator function,  i.e.
-$$
-I(A) = \left\{ 
-\begin{array}{ll}
-1 & A\mbox{ is TRUE} \\
-0 & \mbox{otherwise}
-\end{array}
-\right.
-$$
-%  i.e. $I(A) = 1$ if $A$ is true and $I(A) = 0$ otherwise,
-
+Then a Poisson regression model is 
+\[
+Y_i \ind Po(\lambda_i) 
+\]
 and
-$$
-\mu_1 = \beta_0 \quad \mbox{and} \quad \mu_2 = \beta_0 + \beta_1.
-$$
+\[
+\log(\lambda_i) 
+= \beta_0+\beta_1 X_{i,1} + \beta_2 X_{i,2} + \cdots +\beta_p X_{i,p} 
+\]
+
+As a reminder, $E[Y_i] = Var[Y_i] = \lambda_i$ and thus the variance of the 
+observations increases as the mean increases. 
+
+
+## Interpretation
+
+When all explanatory variables are zero, then 
+\[ 
+E[Y_i|X_{i,1}=0, \ldots,X_{i,p}=0] \pause = \lambda_i \pause = e^{\beta_0}
+\]
+\pause
+thus $\beta_0$ determines the \alert{expected response when all explanatory
+variables are zero}.
+
+\vspace{0.1in} \pause
+
+More generally, 
+\[ 
+E[Y_i|X_{i,1}=x_1, \ldots,X_{i,p}=x_p] 
+\pause 
+= e^{\beta_0+\beta_1x_1+\cdots+\beta_px_p}.
+\]
+\pause
+If $X_{i,1}$  increases by one unit, we have 
+\[ 
+E[Y_i|X_{i,1}=x_1+1, \ldots,X_{i,p}=x_p] 
+\pause 
+= e^{\beta_0+\beta_1(x_1+1)+\cdots+\beta_px_p}
+\pause
+= e^{\beta_0+\beta_1x_1+\cdots+\beta_px_p}e^{\beta_1}
+\]
+\pause
+Thus 
+\[
+\frac{E[Y_i|X_{i,1}=x_1+1, \ldots,X_{i,p}=x_p]}{E[Y_i|X_{i,1}=x_1\phantom{+1}, \ldots,X_{i,p}=x_p]} 
+\pause 
+= e^{\beta_1}.
+\]
+\pause
+Thus $e^{\beta_p}$ is the *multiplicative effect on the mean response for
+a one unit increase in the associated explanatory variable when holding all
+other explanatory variables constant.*
+
+## Assumptions
+
+- Independent observations
+- Expected response 
+
+## Diagnostics
 
 
-```{r triathlon-subgroup}
-d2 <- d |> filter(Division %in% c("F40-44", "F45-49"))
-
-d2 |>
-  group_by(Division) |>
-  summarize(
-    n = n(),
-    mean = mean(Bike.Time),
-    sd = sd(Bike.Time)
-  )
-```
-
-```{r triathlon-subgroup-boxplot}
-ggplot(d2, aes(x = Division, y = Bike.Time)) + 
-  geom_boxplot(outliers = FALSE, color = "gray") + geom_jitter(width = 0.1)
-```
-
-```{r triathlon-subgroup-regression}
-m <- lm(Bike.Time ~ Division, data = d2)
-summary(m)
-```
-
-Comparison to two-sample t-test:
-
-```{r triathlon-subgroup-two-sample-t-test}
-cbind(coef(m), confint(m)) # Regression results
-t.test(Bike.Time ~ Division, 
-       data = d2, 
-       var.equal = TRUE) # Two-sample t-test
-```
-
-
-
-
-## Multiple Linear Regression
-
-### Model
-
-For observation $i = \{1,2,\ldots,n \}$, let
-
-- $Y_i$ be the value of the response variable and
-- $X_{i,j}$ be value of the $j$th explanatory variable 
-
-
-The (multiple linear) regression model  assumes
-$$ 
-Y_i = \beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2} + \cdots + \beta_p X_{i,p} + \epsilon_i
-$$
-
-and 
-$$
-\epsilon_i \stackrel{ind}{\sim} N(0, \sigma^2).
-$$
-
-
-### Interpretation
-
-Recall
-$$
-E[Y_i] = \beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2} + \cdots + \beta_p X_{i,p}
-$$
-
-
-Thus,
-
-- $\beta_0$ is the expected response when all $X_{i,j} = 0$ 
-- $\beta_j$ is the expected increase in the response when $X_{i,j}$ is increased by 1 and all other explanatory variables are held constant
-
-
-When multiple regression is used, 
-you will often see people write the phrases
-``after controlling for'' or ``after adjusting for'' followed by a list of 
-the other explanatory variables in the model.
-
-
-### Assumptions
-
-
-Recall
-$$
-E[Y_i] = \beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2} + \cdots + \beta_p X_{i,p}, \quad \epsilon_i \stackrel{ind}{\sim} N(0, \sigma^2)
-$$
-
-
-Thus, the model assumptions are 
-
-- The errors are independent.
-- The errors are normally distributed.
-- The errors have constant variance. 
-- The relationship between the expected response and the explanatory variables is given above.
-
-
-### Diagnostics
-
-```{r multiple-regression-diagnostics-panel}
-m <- lm(Run.Time ~ Swim.Time + Bike.Time, data = d |> filter(Swim.Time < 500))
-ggResidpanel::resid_panel(m, plots = c("resid", "qq", "cookd"), 
-                          qqbands = TRUE, nrow = 1)
-```
-
-
-```{r multiple-regression-diagnostics-xpanel}
-ggResidpanel::resid_xpanel(m)
-```
-
-### Example
-
-```{r multiple-regression-plot-run-v-swim}
-ggplot(d |> filter(Swim.Time < 500),
-       aes(x = Swim.Time, y = Run.Time, color = Bike.Time)) +
-  geom_point()
-```
-
-
-```{r multiple-regression-plot-run-v-bike}
-ggplot(d |> filter(Swim.Time < 500),
-       aes(x = Bike.Time, y = Run.Time, color = Swim.Time)) +
-  geom_point()
-```
-
-```{r multiple-regression-summary}
-summary(m)
-```
-
-Written summary
-
-```{r multiple-regression-statistics}
-cbind(coef(m), confint(m))
-summary(m)$r.squared
-```
-
-
-Using the 2022 Women's Lake Placid Ironman data, 
-we fit a regression model using run time as the response variable and 
-swim and bike times as the explanatory variables. 
-After adjusting for bike time, each minute increase of swim time was 
-associated with a `r round(coef(m)[2],2)` minute increase in run time with a 
-95\% interval of 
-(`r round(confint(m)[2,1],2)`, `r round(confint(m)[2,2],2)`).
-After adjusting for swim time, each minute increase of bike time was 
-associated with a `r round(coef(m)[3],2)`
-(`r round(confint(m)[3,1],2)`, `r round(confint(m)[3,2],2)`)
-minute increase in run time.
-The model with swim and bike time accounted for 
-`r round(100*summary(m)$r.squared)`\% of the variability in run time.
-
-## ANOVA
-
-When our explanatory variable is categorical with more than 2 levels, 
-we can fit a regression model that will often be referred to as an ANOVA model. 
-
-To fit this model, we do the following
-
-- Choose one level to be the reference level 
-(by default R will choose the level that comes first alphabetically) 
-- Create indicator variables for all the other levels, i.e. 
-$$ 
-\mathrm{I}(\mbox{level for observation $i$ is $<$level$>$}) = \left\{
-\begin{array}{ll}
-1 & \mbox{if level for observation $i$ is $<$level$>$} \\
-0 & \mbox{otherwise}
-\end{array} \right. 
-$$ 
-- Fit a regression model using these indicators.
-
-Most statistical software will perform these actions for you, 
-but it is useful to know this is what is happening.
-
-Summary statistics 
-
-```{r anova-summary-statistics}
-d |> group_by(Division) |> 
-  summarize(
-    n    = n(),
-    mean = mean(Run.Time),
-    sd   = sd(Run.Time)
-  )
-```
-
-```{r anova-plot}
-ggplot(d |> filter(Division != "FPRO"),
-       aes(x = Division, y = Run.Time)) +
-  geom_boxplot(outliers = FALSE, color = "gray") +
-  geom_jitter(width = 0.1)
-```
-
-```{r triathlon-regression-runtime-division}
-m <- lm(Run.Time ~ Division, data = d |> filter(Division != "FPRO"))
-summary(m)
-```
-
-### F-test
-
-When evaluating the statistical support for including a categorical variable
-with more than 2 levels, we use an F-test. 
-
-The hypotheses in an F-test are
-
-- $H_0: \mu_g = \mu$ (the means in all the groups are the same)
-- $H_1: \mu_g \ne \mu_{g'}$ for some $g,g'$ 
-(at least one mean is different)
-
-
-```{r anova-f-test-r-code}
-anova(m)
-drop1(m, test = "F")
-
-# Alternatively fit two models and compare
-m0 <- lm(Run.Time ~ 1, data = d |> filter(Division != "FPRO"))
-anova(m0, m)
-```
-
-Interpretation
-
-```{r anova-statistics}
-cbind(coef(m)[c(1, 3)], confint(m)[c(1, 3), ]) # divide by 60 to get hours
-summary(m)$r.squared
-anova(m)$`Pr(>F)`[1]
-```
-
-Using the 2022 Women's Lake Placid Ironman data, 
-we fit a regression model using run time as the response variable and 
-age division as the explanatory variable. 
-The mean run time for the F25-29 division was 
-`r round(coef(m)[1] / 60, 1)` hours with a 95\% interval of 
-(`r round(confint(m)[1, 1] / 60, 1)`, `r round(confint(m)[1, 2] / 60, 1)`).
-There is evidence of a difference in mean run time amongst the divisions
-(ANOVA F-test p=``r round(anova(m)[1,5], 2)``).
-The estimated difference in run time for the F25-29 division minus the F35-39 
-division was
-`r round(-coef(m)[3])`
-(`r round(-confint(m)[3, 2])`, `r round(-confint(m)[3, 1])`) minutes.
-The model with division accounted for 
-`r round(100*summary(m)$r.squared)`\% of the variability in run time.
-
-## Summary
 
 
