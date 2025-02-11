@@ -13,17 +13,15 @@ Let $Y_i\in\{0,1,2,\ldots\}$ be a count (typically over some amount of time
 or some amount of space) with associated explanatory variables 
 $X_{i,1}, \ldots, X_{i,p}$.
 
-\vspace{0.1in} \pause
-
 Then a Poisson regression model is 
-\[
+$$
 Y_i \ind Po(\lambda_i) 
-\]
+$$
 and
-\[
+$$
 \log(\lambda_i) 
 = \beta_0+\beta_1 X_{i,1} + \beta_2 X_{i,2} + \cdots +\beta_p X_{i,p} 
-\]
+$$
 
 As a reminder, $E[Y_i] = Var[Y_i] = \lambda_i$ and thus the variance of the 
 observations increases as the mean increases. 
@@ -32,41 +30,39 @@ observations increases as the mean increases.
 ## Interpretation
 
 When all explanatory variables are zero, then 
-\[ 
-E[Y_i|X_{i,1}=0, \ldots,X_{i,p}=0] \pause = \lambda_i \pause = e^{\beta_0}
-\]
-\pause
+$$ 
+E[Y_i|X_{i,1}=0, \ldots,X_{i,p}=0]  = \lambda_i  = e^{\beta_0}
+$$
+
 thus $\beta_0$ determines the \alert{expected response when all explanatory
 variables are zero}.
 
-\vspace{0.1in} \pause
-
 More generally, 
-\[ 
+$$ 
 E[Y_i|X_{i,1}=x_1, \ldots,X_{i,p}=x_p] 
-\pause 
+ 
 = e^{\beta_0+\beta_1x_1+\cdots+\beta_px_p}.
-\]
-\pause
+$$
+
 If $X_{i,1}$  increases by one unit, we have 
-\[ 
+$$ 
 E[Y_i|X_{i,1}=x_1+1, \ldots,X_{i,p}=x_p] 
-\pause 
+ 
 = e^{\beta_0+\beta_1(x_1+1)+\cdots+\beta_px_p}
-\pause
+
 = e^{\beta_0+\beta_1x_1+\cdots+\beta_px_p}e^{\beta_1}
-\]
-\pause
+$$
+
 Thus 
-\[
+$$
 \frac{E[Y_i|X_{i,1}=x_1+1, \ldots,X_{i,p}=x_p]}{E[Y_i|X_{i,1}=x_1\phantom{+1}, \ldots,X_{i,p}=x_p]} 
-\pause 
+ 
 = e^{\beta_1}.
-\]
-\pause
-Thus $e^{\beta_p}$ is the *multiplicative effect on the mean response for
+$$
+
+Thus $e^{\beta_p}$ is the *multiplicative effect* on the mean response for
 a one unit increase in the associated explanatory variable when holding all
-other explanatory variables constant.*
+other explanatory variables constant.
 
 ## Assumptions
 
@@ -77,4 +73,226 @@ other explanatory variables constant.*
 
 
 
+## Superbowl scores
 
+```{r superbowl-scores-data}
+# From https://www.espn.com/nfl/superbowl/history/winners
+superbowl_scores <- read_csv('data/superbowl_scores.csv') |>
+  tidyr::separate(RESULT, 
+                  c("winning_points",
+                    "losing_points"),
+                  sep = ", ") |>
+  mutate(
+    winning_points = as.numeric(str_extract(winning_points, "(\\d)+")),
+    losing_points  = as.numeric(str_extract(losing_points,  "(\\d)+")),
+    
+    DATE = as.Date(DATE, format = "%b. %d, %Y")
+  )
+
+head(superbowl_scores)
+summary(superbowl_scores)
+```
+
+How have the winning points changed over time?
+
+```{r superbowl-winning-points-plot}
+ggplot(superbowl_scores,
+       aes(x = DATE, y = winning_points)) + 
+  geom_point() +
+  scale_y_log10() + # Consistent with Poisson regression
+  labs(
+    x = "Year",
+    y = 'Points scored by the winning team',
+    title = 'Superbowl'
+  )
+```
+
+Let's fit a Poisson regression model using winning points as the response 
+variable and DATE as the explanatory variable. 
+
+```{r superbowl-winning-points-poisson-regression}
+m <- glm(winning_points ~ DATE, 
+         data = superbowl_scores, 
+         family = "poisson")      # Poisson regression
+
+m
+```
+
+```{r superbowl-winning-point-poisson-regression-summary}
+summary(m)
+```
+
+When using a Date object, R uses the underlying numeric coding.
+
+```{r date-in-r}
+superbowl_scores$DATE[[1]]             # date written in ISO 8601
+as.numeric(superbowl_scores$DATE[[1]]) # R's numeric encoding
+superbowl_scores$DATE[[1]] - as.Date("1970-01-01") 
+```
+
+Thus when interpreting a coefficient when using a Date explanatory variable, 
+we interpret the increase **per day**. 
+In this case, we probably wanted a **per year** interpretation. 
+
+```{r poisson-regression-per-year}
+superbowl_scores_with_year <- superbowl_scores |>
+  mutate(
+    year = as.numeric(format(DATE, "%Y"))
+  )
+
+head(superbowl_scores_with_year)
+```
+
+
+Rerun the regression
+
+```{r poisson-regression-with-year}
+m <- glm(winning_points ~ year, 
+         data = superbowl_scores_with_year,
+         family = "poisson")
+
+summary(m)
+```
+
+
+
+```{r poisson-regression-interpretation}
+exp(cbind(coef(m), confint(m)))
+
+# Calculate the percentage increase
+perinc <- 100*(exp(c(coef(m)[2], confint(m)[2,])) - 1) 
+perinc
+```
+
+We ran a Poisson regression with number of points the winning team scored on
+year. 
+According to the model, the expected points in 1970 for the winning team is 
+`r round(exp(coef(m)[1]))` with a 95\% confidence
+interval of (`r round(exp(confint(m)[1,1]))`, `r round(exp(confint(m)[1,2]))`).
+The percentage increase in points by the winning team per year is
+`r round(perinc[1], 1)`\% (`r round(perinc[2], 1)`\%, `r round(perinc[3], 1)`\%).
+
+
+
+The Poisson regression does indicate some *overdispersion*, 
+i.e. that the variance is larger than the mean. 
+A quick check looks at the residual deviance relative to its degrees of freedom.
+If there is no overdispersion, then the residual deviance should have a 
+chi-squared distribution with the indicated degrees of freedom. 
+Thus, if the residual deviance is very large compared to its degrees of freedom
+we likely have overdispersion. 
+
+```{r overdispersion-test}
+# p-value for an overdispersion test
+1 - pchisq(m$deviance, m$df.residual)
+```
+
+
+```{r superbowl-scores-plot-with-line}
+ggplot(superbowl_scores_with_year,
+       aes(x = year,
+           y = winning_points)) +
+  geom_point() +
+  scale_y_log10() +
+  geom_line(aes(y = fitted(m)), col = "blue")
+```
+
+### Difference in points
+
+```{r superbowl-points}
+d <- superbowl_scores_with_year |>
+  pivot_longer(cols = c("winning_points", "losing_points"),
+               names_to = "team",
+               values_to = "points") |>
+  mutate(
+    team = gsub("_points", "", team)
+  )
+```
+
+Simple regression using binary variable 
+
+```{r superbowl-points-winning-v-losing}
+m <- glm(points ~ team, 
+         data = d,
+         family = "poisson")
+
+summary(m)
+```
+
+```{r superbowl-points-winning-v-losing-interpretation}
+cbind(coef(m), confint(m)) |> exp()
+
+perinc <- 100*(exp(c(coef(m)[2], confint(m)[2,])) - 1) 
+```
+
+We ran a Poisson regression with number of points scored and winning/losing
+team as the explanatory variable.
+According to the model, the expected points for the losing team is 
+`r round(exp(coef(m)[1]))` with a 95\% confidence
+interval of (`r round(exp(confint(m)[1,1]))`, `r round(exp(confint(m)[1,2]))`).
+The percentage increase in points by the winning team compared to the losing 
+team is
+`r round(perinc[1], 1)`\% (`r round(perinc[2], 1)`\%, `r round(perinc[3], 1)`\%).
+
+
+
+### Points after adjusting for year
+
+
+```{r superbowl-points-winning-v-losing-year}
+m <- glm(points ~ team + year, 
+         data = d,
+         family = "poisson")
+
+summary(m)
+```
+
+```{r superbowl-points-winning-v-losing-year-interpretation}
+cbind(coef(m), confint(m)) |> exp()
+
+perinc <- 100*(exp(cbind(coef(m)[2:3], confint(m)[2:3,])) - 1) 
+perinc
+```
+
+We ran a Poisson regression with number of points scored with winning/losing
+team and year as the explanatory variables.
+According to the model, the expected points for the losing team is 
+`r round(exp(coef(m)[1]))` with a 95\% confidence
+interval of (`r round(exp(confint(m)[1,1]))`, `r round(exp(confint(m)[1,2]))`).
+The percentage increase in points by the winning team compared to the losing 
+team is
+`r round(perinc[1,1], 1)`\% (`r round(perinc[1,2], 1)`\%, `r round(perinc[1,3], 1)`\%).
+The percentage increase in points by the both teams per year is
+`r round(perinc[2,1], 1)`\% (`r round(perinc[2,2], 1)`\%, `r round(perinc[2,3], 1)`\%).
+
+
+### Interaction
+
+
+
+```{r superbowl-points-winning-v-losing-year-interaction}
+m <- glm(points ~ team * year, # Note the *
+         data = d,
+         family = "poisson")
+
+summary(m)
+```
+
+```{r superbowl-points-winning-v-losing-year-interaction-interpretation}
+cbind(coef(m), confint(m)) |> exp()
+
+perinc <- 100*(exp(cbind(coef(m)[2:3], confint(m)[2:3,])) - 1) 
+perinc
+```
+
+
+```{r superbowl-interaction-plot}
+ggplot(d,
+       aes(x = year,
+           y = points,
+           color = team,
+           shape = team)) + 
+  geom_point() + 
+  scale_y_log10() +
+  geom_smooth(method = "glm")
+```
