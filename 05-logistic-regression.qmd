@@ -1,5 +1,7 @@
 # Regression
 
+Stub for regression content
+
 ```{r packages}
 library("tidyverse"); theme_set(theme_bw())
 library("ggResidpanel")
