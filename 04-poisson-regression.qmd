@@ -20,7 +20,7 @@ $$
 and
 $$
 \log(\lambda_i) 
-= \beta_0+\beta_1 X_{i,1} + \beta_2 X_{i,2} + \cdots +\beta_p X_{i,p} 
+= \beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2} + \cdots +\beta_p X_{i,p} 
 $$
 
 As a reminder, $E[Y_i] = Var[Y_i] = \lambda_i$ and thus the variance of the 
@@ -31,7 +31,7 @@ observations increases as the mean increases.
 
 When all explanatory variables are zero, then 
 $$ 
-E[Y_i|X_{i,1}=0, \ldots,X_{i,p}=0]  = \lambda_i  = e^{\beta_0}
+E[Y_i|X_{i,1} = 0, \ldots,X_{i,p} = 0]  = \lambda_i  = e^{\beta_0}
 $$
 
 thus $\beta_0$ determines the **expected response when all explanatory variables are zero**.

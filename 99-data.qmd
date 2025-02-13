@@ -1,5 +1,7 @@
 # Data
 
+This chapter is primarily for data resources. 
+
 ## R Packages
 
 ### CRAN
@@ -7,3 +9,6 @@
 ### Github
 
 - jalapic/engsoccerdata
+
+
+## 

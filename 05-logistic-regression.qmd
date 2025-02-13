@@ -6,3 +6,422 @@ Stub for logistic regression content
 library("tidyverse"); theme_set(theme_bw())
 library("ggResidpanel")
 ```
+
+```{r set-seed}
+set.seed(20250212) # Reproducible simulations
+```
+
+
+## Model
+
+Let $Y_i$ be the count out of $n_i$ attempts where each attempt is independent
+and there is a common probability of success
+$\pi_i$. 
+We assume 
+$$Y_i \stackrel{ind}{\sim} Bin(n_i, \pi_i).$$
+A special case is when 
+$n_i = 1$ and $Y_i$ is a binary variable. 
+
+For each $i$, we have a collection of explanatory variables
+$X_{i,1}, \ldots X_{i,p}$.
+
+Then a logistic regression model assumes
+$$
+\mbox{logit}(\pi_i)=\mbox{log}\left( \frac{\pi_i}{1-\pi_i} \right) =
+\eta = 
+\beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2} + \cdots +\beta_p X_{i,p} 
+$$
+
+where the logistic function of $X_i$ is 
+$$ 
+\pi_i = f(X_i) 
+= \frac{e^{\beta_0+\beta_1 X_{i}}}{1+e^{\beta_0+\beta_1 X_{i}}} 
+=  \frac{1}{1+e^{-(\beta_0+\beta_1 X_{i})}}.
+$$
+
+### Interpretation
+
+When $X_{i,j} = 0$ for all $j$, then 
+$$ 
+E[Y_i|X_{i,1} = 0, \ldots,X_{i,p} = 0] = \pi_i = \frac{1}{1+e^{-\beta_0}}
+$$
+
+thus $\beta_0$ determines the **probability of success when the 
+explanatory variable is zero**.
+
+The odds of success when $X_{i,j} = x_j$ is 
+$$ 
+\frac{\pi_1}{1-\pi_1} = e^{\beta_0+\beta_1x_1 + \cdots \beta_p x_p}.
+$$
+
+The probability of success when $X_1 =x_1 + 1$ and the remainder are left at
+$X_{i,j} =x_j$
+is 
+$$ 
+\frac{\pi_2}{1-\pi_2} = e^{\beta_0+\beta_1(x_1+1) + \cdots \beta_p x_p}
+= e^{\beta_0+\beta_1x_1 + \cdots \beta_p x_p}e^{\beta_1} =
+\frac{\pi_1}{1-\pi_1} e^{\beta_1}.
+$$
+
+Thus, the multiplicative change in the odds for a 1 unit increase in $X_1$ is 
+$$
+\frac{\frac{\pi_2}{1-\pi_2}}{\frac{\pi_1}{1-\pi_1}} 
+= e^{\beta_1}
+$$
+
+This is also referred to as an \alert{odds ratio}.
+
+### Diagnostics
+
+
+
+
+
+## WNBA Shooting
+
+```{r wnba-shots}
+wnba_shots <- read_csv("data/wnba-shots-2021.csv") |>
+  filter( !(grepl("Free Throw", shot_type)) ) |>
+  mutate(
+    distance = sqrt((coordinate_x - 25)^2 + (coordinate_y - 0)^2)
+  ) |>
+  filter( !is.na(distance), !is.na(made_shot))
+
+# Check for incorrectly coded data
+wnba_shots |> filter(shot_value == 2 & distance > 22 + 1.75 / 12) |> select(distance, coordinate_x, coordinate_y) |> arrange(distance)
+wnba_shots |> filter(shot_value == 3 & distance < 22 + 1.75 / 12) |> select(distance, coordinate_x, coordinate_y) |> arrange(distance)
+```
+
+### Sylvia Fowles probability vs distance
+
+```{r fowles-data}
+# Extract Sylvia Fowles shots
+fowles_shots <- wnba_shots |>
+  filter(str_starts(desc, "Sylvia Fowles"))
+
+table(fowles_shots$made_shot)
+
+aggregate_fowles_shots <- fowles_shots |>
+  mutate(
+    distanceR = round(distance)
+  ) |>
+  group_by(distanceR) |>
+  summarize(
+    n = n(),
+    y = sum(made_shot), # TRUE gets converted to 1 and FALSE to 0
+    p = y/n
+  )
+
+g <- ggplot(aggregate_fowles_shots,
+       aes(x = distanceR, y = p, size = n)) +
+  geom_point()
+
+g
+```
+
+
+
+```{r fowles-probability-by-distance-model}
+m <- glm(made_shot ~ distance, # made_shot 
+         data = fowles_shots,
+         family = "binomial")  
+```
+
+```{r fowles-probability-by-distance-diagnostics}
+resid_panel(m)
+```
+
+```{r fowles-probability-by-distance-summary}
+summary(m)
+```
+
+```{r fowles-probability-by-distance-interpretation}
+expit <- function(eta) {
+  1 / (1 + exp(-eta))
+}
+
+cbind(coef(m)[1], confint(m)[1,]) |> expit()
+cbind(coef(m)[2], confint(m)[2,]) |> exp()
+```
+::: {.callout-note}
+
+## Interpretation
+
+We ran a logistic regression using made shot as a success and distance from the
+hoop as the explanatory variable.
+According to the model, the probability of making a shot at a distance of 0 is  
+`r round(expit(coef(m)[1]), 2)` with a 95\% confidence
+interval of (`r round(expit(confint(m)[1,1]), 2)`, `r round(expit(confint(m)[1,2]), 2)`).
+For each additional foot away from the hoop the log odds of making the shot is 
+multiplied by 
+`r round(exp(coef(m)[2]), 2)` with a 95\% confidence
+interval of (`r round(exp(confint(m)[2, 1]), 2)`, `r round(exp(confint(m)[2,2]), 2)`).
+:::
+
+```{r fowles-probability-by-distance-fitted-plot}
+# Create data frame with fitted values
+fowles_fitted <- fowles_shots |>
+  mutate(p = predict(m, type = "response"))
+
+ggplot(fowles_fitted,
+       aes(x = distance)) +
+  geom_point(aes(y = as.numeric(made_shot))) +
+  geom_line(aes(y = p), col = 'blue') +
+  ylim(0, 1)
+  
+```
+
+
+### Sylvia Fowles vs Sue Bird
+
+```{r two-player-data}
+two_player_shots <- wnba_shots |>
+  filter(str_starts(desc, "Sylvia Fowles") | 
+           str_starts(desc, "Sue Bird") ) |>
+  mutate(player = ifelse(str_starts(desc, "Sylvia Fowles"), 
+                         "Sylvia Fowles", 
+                         "Sue Bird"))
+
+two_player_summary <- two_player_shots |>
+  group_by(player) |>
+  summarize(
+    n = n(),
+    y = sum(made_shot),
+    p = y / n
+  )
+
+two_player_summary
+```
+
+Here we see that Sylvia Fowles is the better field goal shooter by field 
+goal percent. 
+This is consistent (although the numbers are somewhat different)
+with the [WNBA 2021 Shooting Statistics](https://www.foxsports.com/wnba/stats?category=shooting&sort=fgpct&season=2021&seasonType=reg&sortOrder=desc).
+
+We could fit a comparison of two binomial proportions.
+
+```{r prop-test}
+pt <- prop.test(two_player_summary$y, two_player_summary$n)
+pt
+```
+An appealing aspect of this approach is that it directly provides an estimate
+with uncertainty about the difference between the two probabilities. 
+
+```{r prop-test-summary}
+diff(pt$estimate)
+pt$conf.int
+```
+
+
+Alternatively we can fit a logistic regression model. 
+
+```{r probability-by-player}
+mP <- glm(made_shot ~ player,
+         data = two_player_shots,
+         family = "binomial")
+
+summary(m)
+```
+
+We have do perform some transformations to get interpretable parameters. 
+
+```{r probability-by-player-interpretation}
+cbind(coef(m)[1], confint(m)[1,]) |> expit() # Probability for reference level
+cbind(coef(m)[2], confint(m)[2,]) |> exp()   # Multicative effect on log odds
+```
+
+::: {.callout-note}
+
+## Interpretation
+
+We ran a logistic regression using the number of made shots out of the total
+and used player (Sylvia Fowles vs Sue Bird) as the explanatory variable.
+According to the model, the probability of making a shot for Sue Bird is  
+`r round(expit(coef(m)[1]), 2)` with a 95\% confidence
+interval of (`r round(expit(confint(m)[1,1]), 2)`, `r round(expit(confint(m)[1,2]), 2)`) and
+the multiplicative effect on log odds for Sylvia Fowles compared to Sue Bird is
+`r round(exp(coef(m)[2]), 2)` with a 95\% confidence
+interval of (`r round(exp(confint(m)[2, 1]), 2)`, `r round(exp(confint(m)[2,2]), 2)`).
+:::
+
+
+
+```{r probability-by-player-distance}
+mPD <- glm(made_shot ~ player + distance,
+         data = two_player_shots,
+         family = "binomial")
+
+summary(m)
+```
+
+In the first model, it appears that Sylvia Fowles is the better shooter. 
+In this model, it appears that there is no significant difference between
+Sylvia Fowles and Sue Bird. 
+This is an example of Simpson's Paradox,
+i.e. our understanding of a relationship changes as we adjust for other 
+explanatory variables.
+
+```{r probability-by-player-distance-interaction}
+mPD <- glm(made_shot ~ player * distance,
+         data = two_player_shots,
+         family = "binomial")
+
+summary(m)
+```
+
+## Golf putting
+
+@fearing2011catch fit a logistic regression model for the probability of 
+making a putt as a function of the distance of the putt. 
+The resulting function they used was
+
+$$
+\mbox{logit}(\pi) = 
+\beta_0 + \beta_1 d + \beta_2 d^2 + \beta_3 d^3 + \beta_4 d^4 + \beta_5 \log(d)
+$$
+
+with estimated values of 
+
+$$
+\mbox{logit}(\pi) = 
+7.31e0 -5.58e0 d + 6.76e-1d^2 -1.97e-2d^3 + 2.93e-4 d^4 -1.62e-6\log(d)
+$$
+
+I'm explicitly using scientific notation here to try and assure that I don't 
+make a typo. 
+
+Encoded in an R function, we have
+
+```{r probability-as-a-function-of-distance}
+putt_probability <- function(d) {
+  eta <- 7.31 - 5.58e0 * d + 
+    6.76e-1 * d^2 -1.97e-2 * d^3 + 
+    2.93e-4 * d^4 -1.62e-6 * log(d)
+  
+  return( 1 / (1 + exp(-eta) ) )
+}
+```
+
+We can plot this function
+
+```{r probability-plot}
+ggplot(data.frame(d = 2:100),
+       aes(x = d)) +
+  stat_function(fun = putt_probability)
+```
+
+Huh?!?!?! This looks nothing like the authors estimated probability in 
+Figure 3. I tried a variety of variations, e.g. using $log$ base 10 and
+forgetting the negative sign in the exponential, but nothing seems to reproduce
+the plot these authors have. 
+
+Since we don't have their actual plot, 
+I'll try to recreate their data from Figure 2. 
+
+```{r simulate-golf-data}
+simulated_putts <- data.frame(
+  n = 1000, 
+  
+  # I measured the height in the pdf
+  p = c(12.9, 12.5, 11.1, 7.5, 5.8, 4.5, 3.7, 3, 2.5, 2.1, 1.8, 1.5,
+        1.4, 1.2, 1.1, 1.0, .9, .8, .7, .6, .5, .5, .5, .5, 
+        rep(0.4, 6), rep(0.3, 10), rep(0.2, 16), rep(0.1, 26),
+        rep(0.05, 18)) /
+    13 # total height
+) |>
+  mutate(
+    d = seq(2, by = 2, length = n()),
+    y = rbinom(n(), size = n, prob = p)
+  )
+```
+
+Let's plot the data to recreate Figure 2 from the paper.
+
+```{r golf-data-plot}
+ggplot(simulated_putts, 
+       aes(x = d, y = y / n)) +
+  geom_point(color = 'red') + 
+  geom_line(color = 'red')
+```
+
+
+Let's fit a logistic regression model to these data.
+We'll start with just using distance, 
+
+```{r golf-logistic-regression-distance}
+m_d <- glm(cbind(y, n - y) ~ d, # cbind(successes, failures)
+           data = simulated_putts,
+           family = "binomial")        # logistic regression 
+```
+
+Diagnostic plots
+
+```{r golf-distance-resid-panel}
+ggResidpanel::resid_panel(m_d, 
+                          qqbands = TRUE,
+                          smoother = TRUE)
+```
+
+This plot shows clear violation of model assumptions. 
+If we take a look at residuals vs distance plot we can see why. 
+
+```{r golf-distance-resid-xpanel}
+ggResidpanel::resid_xpanel(m_d, 
+                          smoother = TRUE)
+```
+
+We could also plot the estimated 
+
+
+
+Thus, it is clear we need an improved model, 
+i.e. we need to include a higher order term for distance. 
+Let's try the terms the original authors used. 
+
+```{r golf-logistic-regression-distance2}
+m_d2 <- glm(cbind(y, n - y) ~ d + I(d^2), 
+            data = simulated_putts,
+            family = "binomial")        
+```
+
+In a generalized linear model, e.g. logistic regression,
+we can use a drop-in-deviance test to evaluate the strength of evidence for 
+terms in a model. 
+If we look at sequential tests, the default in `anova()` then 
+we can just keep terms 
+
+```{r golf-logistic-regression-model-selection}
+anova(m_d2)
+```
+
+Like the authors, all of these terms are significant. 
+We could have even tried more terms, 
+but let's stick with these. 
+
+```{r golf-logistic-regression-summary}
+summary(m_d2)
+```
+
+While the `anova()` output shows sequential tests, 
+i.e. adding one term at a time, this analysis suggests that,
+after including the logarithm of distance, 
+we perhaps didn't need any of the other distances. 
+So let's rearrange the terms.
+
+```{r golf-logistic-regression-distance3}
+m_d3 <- glm(cbind(y, n - y) ~ log(d) + d + I(d^2) + I(d^3) + I(d^4), 
+            data = simulated_putts,
+            family = "binomial")
+
+anova(m_d3)
+summary(m_d3)
+```
+
+```{r model-based-probabilities}
+ggplot(simulated_putts, 
+       aes(x = d, y = y / n)) +
+  geom_point() +
+  geom_line(aes(y = predict(m_d3, type = "response"))) +
+  geom_line(aes(y = predict(m_d,  type = "response")), col= 'red') +
+  geom_line(aes(y = predict(m_d2,  type = "response")), col= 'blue')
+```
