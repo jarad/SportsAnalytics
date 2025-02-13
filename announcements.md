@@ -5,8 +5,10 @@
 - Use Discussion board
   - More timely response
   - Provide specifics of what you did
+  - Try to get questions in before 5pm
 - Homework due today
   - Multiple attempts?
+    - yes, unlimited
 - Dan Nettleton next week
   - I'll be here on Tuesday
   - Attendance is still required

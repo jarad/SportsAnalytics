@@ -79,8 +79,6 @@ $$
 
 This is also referred to as an *odds ratio*.
 
-### Diagnostics
-
 
 
 
@@ -175,7 +173,7 @@ hoop as the explanatory variable.
 According to the model, the probability of making a shot at a distance of 0 is  
 `r round(expit(coef(m)[1]), 2)` with a 95\% confidence
 interval of (`r round(expit(confint(m)[1,1]), 2)`, `r round(expit(confint(m)[1,2]), 2)`).
-For each additional foot away from the hoop the log odds of making the shot is 
+For each additional foot away from the hoop the odds of making the shot is 
 multiplied by 
 `r round(exp(coef(m)[2]), 2)` with a 95\% confidence
 interval of (`r round(exp(confint(m)[2, 1]), 2)`, `r round(exp(confint(m)[2,2]), 2)`).
