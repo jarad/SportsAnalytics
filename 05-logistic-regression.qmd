@@ -269,6 +269,24 @@ mPDI <- glm(made_shot ~ player * distance,
 summary(mPDI)
 ```
 
+```{r probability-by-player-distance-interaction-plot}
+two_player_shots_fitted <- two_player_shots |>
+  mutate(
+    p = predict(mPDI, type = "response")
+  )
+
+ggplot(two_player_shots_fitted,
+       aes(x = distance, y = p, 
+           color = player, 
+           group = player,
+           linetype = player)) + 
+  geom_line()
+```
+
+This is certainly not the end of the story since probability might be a more
+complicated function of distance as we will see in the Golf putting example.
+
+
 ## Golf putting
 
 @fearing2011catch fit a logistic regression model for the probability of 
