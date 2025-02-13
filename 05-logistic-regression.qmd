@@ -20,24 +20,32 @@ $\pi_i$.
 We assume 
 $$Y_i \stackrel{ind}{\sim} Bin(n_i, \pi_i).$$
 A special case is when 
-$n_i = 1$ and $Y_i$ is a binary variable. 
+$n_i = 1$ and $Y_i$ is a binary (Bernoulli) variable. 
 
-For each $i$, we have a collection of explanatory variables
-$X_{i,1}, \ldots X_{i,p}$.
-
-Then a logistic regression model assumes
+If, for each $i$ we have a collection of explanatory variables
+$X_{i,1}, \ldots X_{i,p}$, then a logistic regression model assumes
 $$
 \mbox{logit}(\pi_i)=\mbox{log}\left( \frac{\pi_i}{1-\pi_i} \right) =
-\eta = 
+\eta_i = 
 \beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2} + \cdots +\beta_p X_{i,p} 
 $$
 
-where the logistic function of $X_i$ is 
+where the logistic function of $\eta_i$ is 
 $$ 
-\pi_i = f(X_i) 
-= \frac{e^{\beta_0+\beta_1 X_{i}}}{1+e^{\beta_0+\beta_1 X_{i}}} 
-=  \frac{1}{1+e^{-(\beta_0+\beta_1 X_{i})}}.
+\pi_i = f(\eta_i) 
+= \frac{e^{\eta_i}}{1+e^{\eta_i}} 
+=  \frac{1}{1+e^{-\eta_i}}.
 $$
+
+Some like to call this the `expit()` function
+(since it is the opposit of the `logit()` function above), 
+so we will use this convention in the code
+
+```{r expit}
+expit <- function(eta) {
+  1 / (1 + exp(-eta))
+}
+```
 
 ### Interpretation
 
@@ -47,7 +55,7 @@ E[Y_i|X_{i,1} = 0, \ldots,X_{i,p} = 0] = \pi_i = \frac{1}{1+e^{-\beta_0}}
 $$
 
 thus $\beta_0$ determines the **probability of success when the 
-explanatory variable is zero**.
+explanatory variables are all zero**.
 
 The odds of success when $X_{i,j} = x_j$ is 
 $$ 
@@ -63,13 +71,13 @@ $$
 \frac{\pi_1}{1-\pi_1} e^{\beta_1}.
 $$
 
-Thus, the multiplicative change in the odds for a 1 unit increase in $X_1$ is 
+Thus, the **multiplicative change in the odds for a 1 unit increase in $X_1$** is 
 $$
 \frac{\frac{\pi_2}{1-\pi_2}}{\frac{\pi_1}{1-\pi_1}} 
 = e^{\beta_1}
 $$
 
-This is also referred to as an \alert{odds ratio}.
+This is also referred to as an *odds ratio*.
 
 ### Diagnostics
 
@@ -79,28 +87,47 @@ This is also referred to as an \alert{odds ratio}.
 
 ## WNBA Shooting
 
+This [kaggle competition](https://www.kaggle.com/datasets/mexwell/women-national-basketball-association-shots) 
+provides data on plays in the WNBA during the 2021-2022 season. 
+We'll take a look at the field goal makes as our successes. 
+
+
 ```{r wnba-shots}
 wnba_shots <- read_csv("data/wnba-shots-2021.csv") |>
   filter( !(grepl("Free Throw", shot_type)) ) |>
   mutate(
+    # Calculate distance to the hoop which is apparently at (25, 0)
+    # https://www.kaggle.com/datasets/mexwell/women-national-basketball-association-shots
     distance = sqrt((coordinate_x - 25)^2 + (coordinate_y - 0)^2)
   ) |>
   filter( !is.na(distance), !is.na(made_shot))
-
-# Check for incorrectly coded data
-wnba_shots |> filter(shot_value == 2 & distance > 22 + 1.75 / 12) |> select(distance, coordinate_x, coordinate_y) |> arrange(distance)
-wnba_shots |> filter(shot_value == 3 & distance < 22 + 1.75 / 12) |> select(distance, coordinate_x, coordinate_y) |> arrange(distance)
 ```
+
+Due to the quote in Love Triangle about having shots incorrectly coded as 
+2-pointers or 3-pointers, 
+we'll take a look at points that *may* be incorrectly coded in these data. 
+
+```{r incorrectly-coded-shots}
+# Check for incorrectly coded data
+wnba_shots |> filter(shot_value == 2 & distance > 22 + 1.75 / 12) |> select(shot_value, distance, coordinate_x, coordinate_y) |> arrange(distance)
+wnba_shots |> filter(shot_value == 3 & distance < 22 + 1.75 / 12) |> select(shot_value, distance, coordinate_x, coordinate_y) |> arrange(distance)
+```
+
+We probably need to look into this more thoroughly before we conclude these data
+are incorrectly coded. 
+
 
 ### Sylvia Fowles probability vs distance
 
 ```{r fowles-data}
 # Extract Sylvia Fowles shots
 fowles_shots <- wnba_shots |>
+  # Description (typically) starts with who is shooting
   filter(str_starts(desc, "Sylvia Fowles"))
 
-table(fowles_shots$made_shot)
+table(fowles_shots$made_shot) # response
 
+# For visualization purposes, aggregate shots by rounding to the nearest foot
 aggregate_fowles_shots <- fowles_shots |>
   mutate(
     distanceR = round(distance)
@@ -109,7 +136,7 @@ aggregate_fowles_shots <- fowles_shots |>
   summarize(
     n = n(),
     y = sum(made_shot), # TRUE gets converted to 1 and FALSE to 0
-    p = y/n
+    p = y / n
   )
 
 g <- ggplot(aggregate_fowles_shots,
@@ -136,12 +163,8 @@ summary(m)
 ```
 
 ```{r fowles-probability-by-distance-interpretation}
-expit <- function(eta) {
-  1 / (1 + exp(-eta))
-}
-
-cbind(coef(m)[1], confint(m)[1,]) |> expit()
-cbind(coef(m)[2], confint(m)[2,]) |> exp()
+c(coef(m)[1], confint(m)[1,]) |> expit()
+c(coef(m)[2], confint(m)[2,]) |> exp()
 ```
 ::: {.callout-note}
 
@@ -168,7 +191,6 @@ ggplot(fowles_fitted,
   geom_point(aes(y = as.numeric(made_shot))) +
   geom_line(aes(y = p), col = 'blue') +
   ylim(0, 1)
-  
 ```
 
 
@@ -226,8 +248,8 @@ summary(mP)
 We have do perform some transformations to get interpretable parameters. 
 
 ```{r probability-by-player-interpretation}
-cbind(coef(mP)[1], confint(mP)[1,]) |> expit() # Probability for reference level
-cbind(coef(mP)[2], confint(mP)[2,]) |> exp()   # Multicative effect on log odds
+c(coef(mP)[1], confint(mP)[1,]) |> expit() # Probability for reference level
+c(coef(mP)[2], confint(mP)[2,]) |> exp()   # Multiplicative effect on odds
 ```
 
 ::: {.callout-note}
@@ -236,7 +258,7 @@ cbind(coef(mP)[2], confint(mP)[2,]) |> exp()   # Multicative effect on log odds
 
 We ran a logistic regression using the number of made shots out of the total
 and used player (Sylvia Fowles vs Sue Bird) as the explanatory variable.
-According to the model, the probability of making a shot for Sue Bird is  
+According to the model, the probability of making a shot for Sue Bird is 
 `r round(expit(coef(mP)[1]), 2)` with a 95\% confidence
 interval of (`r round(expit(confint(mP)[1,1]), 2)`, `r round(expit(confint(mP)[1,2]), 2)`) and
 the multiplicative effect on log odds for Sylvia Fowles compared to Sue Bird is
@@ -244,7 +266,9 @@ the multiplicative effect on log odds for Sylvia Fowles compared to Sue Bird is
 interval of (`r round(exp(confint(mP)[2, 1]), 2)`, `r round(exp(confint(mP)[2,2]), 2)`).
 :::
 
-
+We likely expect that distance will affect the probability of making a shot
+as we saw previously.
+So let's include distance in our model.
 
 ```{r probability-by-player-distance}
 mPD <- glm(made_shot ~ player + distance,
@@ -254,20 +278,34 @@ mPD <- glm(made_shot ~ player + distance,
 summary(mPD)
 ```
 
-In the first model, it appears that Sylvia Fowles is the better shooter. 
-In this model, it appears that there is no significant difference between
-Sylvia Fowles and Sue Bird. 
+When we do not include distance in the model, 
+it appears that Sylvia Fowles is the better shooter. 
+When distance is included in the model, 
+it appears that there is no evidence of a difference in field goal percentage
+between Sylvia Fowles and Sue Bird (p = `r round(summary(mPD)$coefficients[2,4], 2)`). 
 This is an example of Simpson's Paradox,
 i.e. our understanding of a relationship changes as we adjust for other 
 explanatory variables.
 
+We may expect further that the effect of distance will be different for 
+Sylvia Fowles compared to Sue Bird since Sylvia Fowles is a 6'6" center while
+Sue Bird is 5'9" point guard.
+To allow for the effect of distance to depend on the player, 
+we include an interaction between distance and player. 
+
 ```{r probability-by-player-distance-interaction}
-mPDI <- glm(made_shot ~ player * distance,
+mPDI <- glm(made_shot ~ player * distance, # Note the * for the interaction
          data = two_player_shots,
          family = "binomial")
 
 summary(mPDI)
 ```
+
+There is evidence that distance effects the two players differently
+(`r round(summary(mPDI)$coefficients[4,4], 3)`).
+Rather than trying to directly interpret these coefficients,
+it is much more straightforward to plot the estimated probabilities
+as a function of distance. 
 
 ```{r probability-by-player-distance-interaction-plot}
 two_player_shots_fitted <- two_player_shots |>
@@ -285,6 +323,8 @@ ggplot(two_player_shots_fitted,
 
 This is certainly not the end of the story since probability might be a more
 complicated function of distance as we will see in the Golf putting example.
+
+
 
 
 ## Golf putting
@@ -312,7 +352,7 @@ Encoded in an R function, we have
 
 ```{r probability-as-a-function-of-distance}
 putt_probability <- function(d) {
-  eta <- 7.31 - 5.58e0 * d + 
+  eta <- 7.31e0 - 5.58e0 * d + 
     6.76e-1 * d^2 -1.97e-2 * d^3 + 
     2.93e-4 * d^4 -1.62e-6 * log(d)
   
@@ -329,9 +369,9 @@ ggplot(data.frame(d = 2:100),
 ```
 
 Huh?!?!?! This looks nothing like the authors estimated probability in 
-Figure 3. I tried a variety of variations, e.g. using $log$ base 10 and
+Figure 3. I tried a variety of variations, e.g. using log base 10 and
 forgetting the negative sign in the exponential, but nothing seems to reproduce
-the plot these authors have. 
+the plot the authors have. 
 
 Since we don't have their actual plot, 
 I'll try to recreate their data from Figure 2. 
@@ -367,9 +407,9 @@ Let's fit a logistic regression model to these data.
 We'll start with just using distance, 
 
 ```{r golf-logistic-regression-distance}
-m_d <- glm(cbind(y, n - y) ~ d, # cbind(successes, failures)
+m_d <- glm(cbind(y, n - y) ~ d,    # cbind(successes, failures)
            data = simulated_putts,
-           family = "binomial")        # logistic regression 
+           family = "binomial")    # logistic regression 
 ```
 
 Diagnostic plots

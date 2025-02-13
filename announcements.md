@@ -1,5 +1,16 @@
 # Announcements
 
+## 2025-02-13
+
+- Use Discussion board
+  - More timely response
+  - Provide specifics of what you did
+- Homework due today
+  - Multiple attempts?
+- Dan Nettleton next week
+  - I'll be here on Tuesday
+  - Attendance is still required
+
 ## 2025-02-11
 
 - Website https://isusportsanalytics.netlify.app/

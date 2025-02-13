@@ -1,6 +1,7 @@
 # Data
 
 This chapter is primarily for data resources. 
+[Here](https://github.com/jarad/SportsAnalytics/tree/main/data) are the datasets used in this book.
 
 ## R Packages
 
@@ -11,4 +12,6 @@ This chapter is primarily for data resources.
 - jalapic/engsoccerdata
 
 
-## 
+## Kaggle
+
+- [WNBA 2021-2022](https://www.kaggle.com/datasets/mexwell/women-national-basketball-association-shots)
