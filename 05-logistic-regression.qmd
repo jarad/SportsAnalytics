@@ -220,14 +220,14 @@ mP <- glm(made_shot ~ player,
          data = two_player_shots,
          family = "binomial")
 
-summary(m)
+summary(mP)
 ```
 
 We have do perform some transformations to get interpretable parameters. 
 
 ```{r probability-by-player-interpretation}
-cbind(coef(m)[1], confint(m)[1,]) |> expit() # Probability for reference level
-cbind(coef(m)[2], confint(m)[2,]) |> exp()   # Multicative effect on log odds
+cbind(coef(mP)[1], confint(mP)[1,]) |> expit() # Probability for reference level
+cbind(coef(mP)[2], confint(mP)[2,]) |> exp()   # Multicative effect on log odds
 ```
 
 ::: {.callout-note}
@@ -237,11 +237,11 @@ cbind(coef(m)[2], confint(m)[2,]) |> exp()   # Multicative effect on log odds
 We ran a logistic regression using the number of made shots out of the total
 and used player (Sylvia Fowles vs Sue Bird) as the explanatory variable.
 According to the model, the probability of making a shot for Sue Bird is  
-`r round(expit(coef(m)[1]), 2)` with a 95\% confidence
-interval of (`r round(expit(confint(m)[1,1]), 2)`, `r round(expit(confint(m)[1,2]), 2)`) and
+`r round(expit(coef(mP)[1]), 2)` with a 95\% confidence
+interval of (`r round(expit(confint(mP)[1,1]), 2)`, `r round(expit(confint(mP)[1,2]), 2)`) and
 the multiplicative effect on log odds for Sylvia Fowles compared to Sue Bird is
-`r round(exp(coef(m)[2]), 2)` with a 95\% confidence
-interval of (`r round(exp(confint(m)[2, 1]), 2)`, `r round(exp(confint(m)[2,2]), 2)`).
+`r round(exp(coef(mP)[2]), 2)` with a 95\% confidence
+interval of (`r round(exp(confint(mP)[2, 1]), 2)`, `r round(exp(confint(mP)[2,2]), 2)`).
 :::
 
 
@@ -251,7 +251,7 @@ mPD <- glm(made_shot ~ player + distance,
          data = two_player_shots,
          family = "binomial")
 
-summary(m)
+summary(mPD)
 ```
 
 In the first model, it appears that Sylvia Fowles is the better shooter. 
@@ -262,11 +262,11 @@ i.e. our understanding of a relationship changes as we adjust for other
 explanatory variables.
 
 ```{r probability-by-player-distance-interaction}
-mPD <- glm(made_shot ~ player * distance,
+mPDI <- glm(made_shot ~ player * distance,
          data = two_player_shots,
          family = "binomial")
 
-summary(m)
+summary(mPDI)
 ```
 
 ## Golf putting
