@@ -1,0 +1,17 @@
+Package: isusportsanalytics
+Title: ISU Sports Analytics
+Version: 0.1
+Authors@R: c(
+    person("Jarad", "Niemi", , "niemi@iastate.edu", role = c("aut", "cre"))
+  )
+URL: https://github.com/jarad/STAT5860
+Depends: 
+    R (>= 3.1.0)
+Imports:
+    igraph,
+    plotly,
+    quarto,
+    tidyverse (>= 2.0.0)
+Encoding: UTF-8
+License: CC NC ND 3.0
+
