@@ -1,14 +1,12 @@
-# Head-to-Head Analyses
+# Margin of Victory
 
 ```{r packages}
 library("tidyverse"); theme_set(theme_bw())
 library("ggResidpanel")
 ```
 
-## Head-to-head
-
-A simple example of head-to-head data is this fictitious collection of 4 teams
-that have played 5 games. 
+A simple example of margin-of-vectory data is this fictitious collection of 4 
+teams that have played 5 games. 
 
 ```{r data}
 d <- tribble(
@@ -49,7 +47,7 @@ X
 ```
 
 
-### Model
+## Model
 
 A model for the margin of victory is 
 
@@ -84,6 +82,15 @@ victory since
 $$(\theta_H + c) - (\theta_A + c) = \theta_H - \theta_A.$$
 Even though the individual $\theta$ are not identifiable,
 the differences are. 
+
+::: {.callout-note}
+## Identifiable
+Parameters (or functions of parameters) within a model are said to be 
+*identifiable* if they can theoretically be estimated with an infinite amount 
+of (the right kind of) data. 
+That is, as you collect more and more data, the uncertainty in the parameter
+decreases to zero.
+:::
 
 
 ### Regression
@@ -237,7 +244,7 @@ pt( (team_ability[2] - team_ability[3]) / summary(m2)$sigma, summary(m2)$df[2])
 
 
 
-### Graphs
+### Estimability
 
 Consider this set of teams and games
 
@@ -250,7 +257,8 @@ d3 <- tribble(
 ```
 
 From these data, we cannot determine how good teams 1-2 and compared to teams
-3-4. Even if we have alot more data, 
+3-4. Even if with a lot more data we may not be able to estimate the model
+parameters.
 
 ```{r disconnected-data2}
 d4 <- tribble(
@@ -265,5 +273,63 @@ d4 <- tribble(
       3,     4,      -6 
 ) 
 ```
+
+If we try to actually fit this model, 
+
+```{r disconnected-data2-model}
+X4 <- construct_model_matrix(d4)
+m4 <- lm(d4$margin ~ X4)
+summary(m4)
+```
+
+While previously we had only 1 line with NAs, 
+we now have 3 lines with NAs. 
+
+::: {.callout-note}
+## Estimability
+Parameters are said to be *estimable* with a certain said of data if
+the parameters can be estimated with that data. 
+Thus parameters may be *identifiable* but not estimable while
+parameters that are not identifiable are never estimable. 
+:::
+
+#### Graphs
+
+In these models, the graph of team contests is helpful. 
+
+```{r graph}
+library("igraph")
+
+plot(graph_from_data_frame(d3, directed = FALSE))
+plot(graph_from_data_frame(d4, directed = FALSE))
+```
+
+Parameters (or functions of parameters) may also be weakly estimable. 
+
+## Rating Systems
+
+### Sagarin Ratings
+
+An example of publish margin of victory model estimates are
+[Sagarin Ratings](http://sagarin.com/sports/cbsend.htm).
+There is an 
+[R package that may be able to scrape Sagarin ratings](https://github.com/jarad/sagarin).
+Argh, these have stopped being updated in 2023.
+
+### Ken Pomeroy
+
+I believe 
+[Ken Pomeroy's ratings](https://kenpom.com/index.php) are based on 
+these margin-of-victory models. 
+
+
+
+
+## Examples
+
+### Iowa High School Football
+
+
+## R packages
 
 

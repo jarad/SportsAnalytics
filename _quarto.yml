@@ -12,6 +12,7 @@ book:
     - 03-regression.qmd
     - 04-poisson-regression.qmd
     - 05-logistic-regression.qmd
+    - 06-margin-of-victory.qmd
     - summary.qmd
     - references.qmd
     - 99-data.qmd

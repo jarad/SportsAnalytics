@@ -1,0 +1,13 @@
+# Win-Loss Models
+
+
+
+## R packages
+
+The models discussed in this chapter are often referred to as 
+Bradley-Terry models after the original manuscript written by 
+
+- [BradleyTerry2](https://cran.r-project.org/web/packages/BradleyTerry2/index.html)
+- [BradleyTerryScalable](https://github.com/EllaKaye/BradleyTerryScalable)
+- [bpcs]()
+-
