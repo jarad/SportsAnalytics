@@ -24,9 +24,9 @@ d <- tribble(
 
 For the analysis that follows, 
 we will construct a model matrix $X$ where 
-$X_{h,g} = 1$ if team $h$ is the home team in game $g$,  
-$X_{h,g} = -1$ if team $h$ is the away team in game $g$,
-$X_{h,g} = 0$ otherwise.
+$X_{g,t} = 1$ if team $t$ is the home team in game $g$,  
+$X_{g,t} = -1$ if team $t$ is the away team in game $g$,
+$X_{g,t} = 0$ otherwise.
 
 ```{r model-matrix}
 construct_model_matrix <- function(d) {
