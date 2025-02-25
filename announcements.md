@@ -1,5 +1,22 @@
 # Announcements
 
+## 2025-02-25
+
+- Homework assigned by Friday
+  - Margin of victory models
+- I really appreciate Discussion board responses
+- Reorganizing "textbook" content
+  - Categorization
+  - Foundations
+    - Distributions
+    - Regression
+  - Independent
+  - Head-to-head
+    - Margin-of-victory
+    - Win/loss
+    - March Madness
+  - Free-for-all
+
 ## 2025-02-13
 
 - Use Discussion board
