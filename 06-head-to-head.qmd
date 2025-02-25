@@ -1,0 +1,269 @@
+# Head-to-Head Analyses
+
+```{r packages}
+library("tidyverse"); theme_set(theme_bw())
+library("ggResidpanel")
+```
+
+## Head-to-head
+
+A simple example of head-to-head data is this fictitious collection of 4 teams
+that have played 5 games. 
+
+```{r data}
+d <- tribble(
+  ~home, ~away, ~home_score, ~away_score, 
+      1,     2,          21,           7,
+      2,     3,          13,          14,
+      4,     1,           3,          28,
+      3,     4,          31,           0,
+      1,     3,          42,          10
+) |>
+  mutate(
+    margin = home_score - away_score
+  )
+```
+
+For the analysis that follows, 
+we will construct a model matrix $X$ where 
+$X_{h,g} = 1$ if team $h$ is the home team in game $g$,  
+$X_{h,g} = -1$ if team $h$ is the away team in game $g$,
+$X_{h,g} = 0$ otherwise.
+
+```{r model-matrix}
+construct_model_matrix <- function(d) {
+  m <- matrix(0, 
+              nrow = nrow(d), 
+              ncol = length(unique(c(d$home, d$away))))
+  
+  for (i in 1:nrow(d)) {
+    m[i, d$home[i]] <-  1
+    m[i, d$away[i]] <- -1
+  }
+  
+  return(m)
+}
+
+X <- construct_model_matrix(d)
+X
+```
+
+
+### Model
+
+A model for the margin of victory is 
+
+$$M_i = \eta + \theta_H - \theta_A + \epsilon_i$$
+
+where 
+
+- $M_i$ is the margin of victory for game $i$,
+- $\eta$ is the home field advantage,
+- $\theta_{H[i]}$ is the ability of the home team in game $i$, and 
+- $\theta_{A[i]}$ is the ability of the away team in game $i$.
+
+The $\epsilon_i$ is a random noise term. 
+This term arises because if two teams play each other repeatedly we would 
+expect that the score in their games would be random around the expected
+margin of victory.
+
+$$E[M_i] = \eta + \theta_H - \theta_A.$$
+
+
+### Identifiability
+
+In this model, 
+when two teams play each other, the margin of victory is expected to be the 
+home field advantage $\eta$ plus the difference in strengths between the two
+teams $\theta_H - \theta_A$.
+Thus, the individual $\theta$s are not *identifiable*, but only there 
+difference is. 
+Another way to state this is that we could add a constant to all of the 
+team strengths and it would not change the distribution of the margin of 
+victory since 
+$$(\theta_H + c) - (\theta_A + c) = \theta_H - \theta_A.$$
+Even though the individual $\theta$ are not identifiable,
+the differences are. 
+
+
+### Regression
+
+
+If we assume $\epsilon_i \stackrel{ind}{\sim} N(0,\sigma^2)$,
+then this is a linear regression model. 
+To see how it is a linear regression model, 
+we use the model matrix above and construct the following model
+
+$$M_i = \eta + \theta_1 X_{i,1} + \theta_2 X_{i,2} + 
+\theta_3 X_{i,3} + \theta_4 X_{i,4} + \epsilon_i, 
+\quad \epsilon_i \stackrel{ind}{\sim} N(0,\sigma^2)$$.
+
+Thus, we can estimate the parameters in this model using linear regression.
+
+```{r regression}
+m <- lm(d$margin ~ X) # intercept (home-field advantage) is included automatically
+```
+
+
+
+```{r regression-summary}
+summary(m)
+```
+
+
+
+From this model, we can obtain individual values for $\theta$.
+The estimated values are 
+
+```{r regression-estimates}
+coef(m)
+```
+
+With these data, the estimated home field advantage is 
+$\eta = \Sexpr{coef(m)[1]}.
+The estimated ability for the teams are 
+```{r coef-no-intercept}
+coef(m)[-1]
+```
+
+The fourth team has an estimated value of $\theta_4 = \Sexpr{coef(m)[5]}$,
+i.e. not available. 
+The reason for this is the identifiability issue above. 
+
+Here, the $\Sexpr{coef(m)[5]}$ can be replaced by 0. 
+
+```{r team-ability}
+team_ability <- coef(m)[-1]
+team_ability[4] <- 0
+team_ability
+```
+
+Using these team ability estimates, we can compute the expected point 
+difference between the teams. 
+For example, on a neutral court, the expected point difference between team
+1 and team 2 is
+```{r expected-point-difference-1-v-2}
+team_ability[1] - team_ability[2] # expected point difference on a neutral court
+```
+So Team 1 is expected to beat Team 2 by 
+\Sexpr{round(team_ability[1] - team_ability[2])}
+points. 
+
+
+### Prediction
+
+In addition to the expected point difference,
+you can use this model to predict the probability that one team beats the 
+other team. 
+In order to perform this prediction, we need to know the variability around
+the expected point spread. 
+We can extract this information from the regression model.
+The estimated residual standard deviation is 
+```{r residual-sd}
+summary(m)$sigma
+```
+
+Prediction in a regression model utilizes a $t$ distribution with degrees
+of freedom equal to the number of observations minus the number of teams. 
+This is given in the R output.
+```{r df}
+summary(m)$df[2] 
+```
+Thus to calculate the probability that Team 1 beats Team 2 on a neutral court
+we calculate
+$$P\left(T_v < \frac{\theta_1 - \theta_2}{\hat\sigma}\right).$$
+In R code, we have 
+
+```{r probability-neutral}
+pt( (team_ability[1] - team_ability[2]) / summary(m)$sigma, summary(m)$df[2] )
+```
+
+
+### Transitivity
+
+One drawback of these types of models is that the model is transitive, 
+but this may not reflect reality. 
+The transitivity property in this model is 
+$$\theta_A > \theta_B \quad\&\quad \theta_B > \theta_C \,\implies\, \theta_A > \theta_C.$$
+In words, this means that if Team 1 is better than Team 2 and 
+Team 2 is better than Team 3, 
+then Team 1 must be better than Team 3. 
+This precludes the possibility that Team 3 could match up well against Team 1. 
+
+As an example, consider the following set of teams and games.
+```{r non-transitive-data}
+d2 <- tribble(
+  ~home, ~away, ~margin, 
+      1,     2,     100,   
+      2,     3,      90, 
+      3,     1,      95,
+  
+      2,     1,    -100,   
+      3,     2,     -90, 
+      1,     3,     -95
+) 
+```
+
+If these were data for basketball games, 
+we would expect that 
+Team 1 has a high probability of beating Team 2,
+Team 2 has a high probability of beating Team 3, and
+Team 3 has a high probability of beating Team 1. 
+
+Fitting the model above and estimating the probstrengths tells a different
+story.
+
+```{r non-transitive-modeling}
+X2 <- construct_model_matrix(d2)
+
+m2 <- lm(d2$margin ~ X2)
+summary(m2)
+```
+
+We can already see issues here since none of the coefficients are 
+significantly different from zero. 
+
+```{r non-transitive-probstrengths}
+# Calculate team strengths
+team_ability <- coef(m2)[-1]
+team_ability[3] <- 0
+team_ability
+
+# Calculate probstrengths
+pt( (team_ability[1] - team_ability[2]) / summary(m2)$sigma, summary(m2)$df[2])
+pt( (team_ability[1] - team_ability[3]) / summary(m2)$sigma, summary(m2)$df[2])
+pt( (team_ability[2] - team_ability[3]) / summary(m2)$sigma, summary(m2)$df[2])
+```
+
+
+
+### Graphs
+
+Consider this set of teams and games
+
+```{r disconnected-data}
+d3 <- tribble(
+  ~home, ~away, ~margin, 
+      1,     2,      10,   
+      3,     4,       9
+) 
+```
+
+From these data, we cannot determine how good teams 1-2 and compared to teams
+3-4. Even if we have alot more data, 
+
+```{r disconnected-data2}
+d4 <- tribble(
+  ~home, ~away, ~margin, 
+      1,     2,      10,   
+      3,     4,       9, 
+      1,     2,       5,   
+      3,     4,      13, 
+      1,     2,       1,   
+      3,     4,      -3, 
+      1,     2,       2,   
+      3,     4,      -6 
+) 
+```
+
+
