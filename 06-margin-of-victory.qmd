@@ -300,11 +300,84 @@ In these models, the graph of team contests is helpful.
 ```{r graph}
 library("igraph")
 
+plot(graph_from_data_frame(d3))
 plot(graph_from_data_frame(d3, directed = FALSE))
 plot(graph_from_data_frame(d4, directed = FALSE))
 ```
 
 Parameters (or functions of parameters) may also be weakly estimable. 
+Consider these data
+
+```{r}
+d_conf <- tribble(
+  ~home, ~away, ~margin, 
+      1,     2,      10, # Conference 1  
+      3,     4,       9, 
+      2,     3,      -2,
+      1,     4,     -20,
+      3,     1,       4,
+      4,     2,      16,
+      5,     6,      10, # Conference 2
+      7,     8,       9, 
+      6,     7,      -2,
+      5,     8,     -20,
+      7,     5,       4,
+      8,     6,      16,
+      1,     5,      10 # Inter-conference Game
+) 
+```
+
+```{r}
+plot(graph_from_data_frame(d_conf))
+```
+
+Predict the outcome for two teams 
+
+```{r}
+# Predict the outcome for 3 vs 7
+Xconf <- construct_model_matrix(d_conf)
+m <- lm(d_conf$margin ~ Xconf)
+summary(m)
+
+# Expected point difference (neutral court)
+(exp_diff <- coef(m)[4] - coef(m)[8])
+
+# Probability of winning (neutral court)
+pt( exp_diff / summary(m)$sigma, df = summary(m)$df[2])
+```
+
+Now let's change the result for the intraconference game and see what happens.
+
+```{r}
+d_conf2 <- d_conf
+d_conf2$margin[nrow(d_conf2)]        # old score
+d_conf2$margin[nrow(d_conf2)] <- -10 # new score
+
+# Predict the outcome for 3 vs 7
+Xconf2 <- construct_model_matrix(d_conf2)
+m2 <- lm(d_conf2$margin ~ Xconf2)
+summary(m2)
+
+# Expected point difference (neutral court)
+(exp_diff2 <- coef(m2)[4] - coef(m2)[8])
+
+# Probability of winning (neutral court)
+pt( exp_diff2 / summary(m2)$sigma, df = summary(m2)$df[2])
+```
+
+Inter-conference play determines amount of ``strength'' allocated to the
+conference. 
+
+```{r}
+plot(coef(m)[-1], coef(m2)[-1])
+```
+
+
+
+
+
+
+
 
 ## Rating Systems
 
