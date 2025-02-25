@@ -8,10 +8,10 @@ URL: https://github.com/jarad/STAT5860
 Depends: 
     R (>= 3.1.0)
 Imports:
+    BradleyTerry2,
     igraph,
     plotly,
     quarto,
     tidyverse (>= 2.0.0)
 Encoding: UTF-8
 License: CC NC ND 3.0
-
