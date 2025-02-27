@@ -693,6 +693,15 @@ ggplot(teams,
   )
 ```
 
+One aspect of these data that have not been addressed is the bias due to the
+way the 9th inning works in baseball. 
+In the bottom of the 9th inning, the home team immediately wins if they are 
+ever ahead of the away team. 
+This could happen sometime during the 9th inning or even before the bottom of 
+the 9th inning occurs. 
+The bias that results is likely a underestimate of the home field advantage
+because the home team scores less points than they could have. 
+
 ## R packages
 
 Are there any or do we really have to do all of this by hand?
