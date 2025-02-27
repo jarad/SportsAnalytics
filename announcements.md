@@ -1,5 +1,22 @@
 # Announcements
 
+## 2025-02-27
+
+- Homework out tomorrow (due next Thursday)
+  - Head-to-head data
+  - Some automatic grading in Canvas (a few attempts)
+- Head-to-head data discussion board post comments
+- Project Ideas
+- March Madness
+  - Tournament selection on Mar 16
+  - ISU v KSU Competition (ncaa.com)
+  - After today, 4 classes before tournament selection
+    - Win-loss models
+    - "Optimal" sheets
+      - Maximizing Expected Points
+      - Maximizing Profit
+      - Maximizing Fun
+
 ## 2025-02-25
 
 - Homework assigned by Friday
