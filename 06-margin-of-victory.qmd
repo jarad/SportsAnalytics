@@ -30,13 +30,16 @@ $X_{g,t} = 0$ otherwise.
 
 ```{r model-matrix}
 construct_model_matrix <- function(d) {
-  m <- matrix(0, 
-              nrow = nrow(d), 
-              ncol = length(unique(c(d$home, d$away))))
+  n_games <- nrow(d)
+  n_teams <- length(unique(c(d$home, d$away)))
   
-  for (i in 1:nrow(d)) {
-    m[i, d$home[i]] <-  1
-    m[i, d$away[i]] <- -1
+  m <- matrix(0, 
+              nrow = n_games, 
+              ncol = n_teams)
+  
+  for (g in 1:n_games) {
+    m[g, d$home[g]] <-  1
+    m[g, d$away[g]] <- -1
   }
   
   return(m)
@@ -127,17 +130,17 @@ coef(m)
 ```
 
 With these data, the estimated home field advantage is 
-$\eta = \Sexpr{coef(m)[1]}.
+$\eta = `r coef(m)[1]`.
 The estimated ability for the teams are 
 ```{r coef-no-intercept}
 coef(m)[-1]
 ```
 
-The fourth team has an estimated value of $\theta_4 = \Sexpr{coef(m)[5]}$,
+The fourth team has an estimated value of $\theta_4 = `r coef(m)[5]`$,
 i.e. not available. 
 The reason for this is the identifiability issue above. 
 
-Here, the $\Sexpr{coef(m)[5]}$ can be replaced by 0. 
+Here, the $`r coef(m)[5]`$ can be replaced by 0. 
 
 ```{r team-ability}
 team_ability <- coef(m)[-1]
@@ -153,7 +156,7 @@ For example, on a neutral court, the expected point difference between team
 team_ability[1] - team_ability[2] # expected point difference on a neutral court
 ```
 So Team 1 is expected to beat Team 2 by 
-\Sexpr{round(team_ability[1] - team_ability[2])}
+`r round(team_ability[1] - team_ability[2])`
 points. 
 
 
@@ -300,7 +303,7 @@ In these models, the graph of team contests is helpful.
 ```{r graph}
 library("igraph")
 
-plot(graph_from_data_frame(d3))
+plot(graph_from_data_frame(d3[,c(2,1)]))          # arrows point away -> home
 plot(graph_from_data_frame(d3, directed = FALSE))
 plot(graph_from_data_frame(d4, directed = FALSE))
 ```
@@ -328,7 +331,7 @@ d_conf <- tribble(
 ```
 
 ```{r}
-plot(graph_from_data_frame(d_conf))
+plot(graph_from_data_frame(d_conf[, c(2,1)]))
 ```
 
 Predict the outcome for two teams 
@@ -402,6 +405,92 @@ these margin-of-victory models.
 
 ### Iowa High School Football
 
+
+### International Handball
+
+```{r handball-data}
+handball2024 <- read_csv("data/Handball_W_InternationalResults.csv",
+                     col_types = cols(
+                       ScoreA = col_double(),
+                       ScoreB = col_double(),
+                       year = col_integer(),
+                       Date = col_date(),
+                       .default = col_character()
+                     )) |>
+  filter(year == 2024) |>
+  mutate(
+    margin = ScoreA - ScoreB
+  )
+```
+
+```{r handball-graph}
+
+# plot(graph_from_data_frame(handball[,c("TeamA","TeamB")]), directed = FALSE)
+
+library("networkD3")
+
+p <- simpleNetwork(handball2024, 
+                   height="100px", width="100px",        
+        Source = "TeamA",                 # column number of source
+        Target = "TeamB",                 # column number of target
+        linkDistance = 10,          # distance between node. Increase this value to have more space between nodes
+        charge = -900,                # numeric value indicating either the strength of the node repulsion (negative value) or attraction (positive value)
+        fontSize = 14,               # size of the node names
+        fontFamily = "serif",       # font og node names
+        linkColour = "#666",        # colour of edges, MUST be a common colour for the whole graph
+        nodeColour = "#69b3a2",     # colour of nodes, MUST be a common colour for the whole graph
+        opacity = 0.9,              # opacity of nodes. 0=transparent. 1=no transparency
+        zoom = T                    # Can you zoom on the figure?
+        )
+
+p
+```
+
+```{r handball-filter}
+separated_countries <- c("Romania", "Bosnia and Herzegovina", "Greece", "Croatia")
+
+handball2024b <- handball2024 |>
+  filter(!( TeamA %in% separated_countries | TeamB %in% separated_countries) )
+```
+
+
+```{r handball-model}
+# Convert team names into factors
+teams <- data.frame(
+  names = unique(handball2024b$TeamA, handball2024b$TeamB) |>
+    unique() |>
+    sort() |>
+    factor()
+) 
+
+X_h <- handball2024b |>
+  rename(
+    home = TeamA,
+    away = TeamB
+  ) |>
+  mutate(
+    home = factor(home, levels = teams$names),
+    away = factor(away, levels = teams$names)
+  ) |>
+  construct_model_matrix()
+
+dim(X_h) # n_games x n_teams
+
+m <- lm(handball2024b$margin ~ X_h - 1) # remove the home field advantage
+
+teams$strength <- coef(m)
+teams$strength[nrow(teams)] <- 0
+teams$strength <- teams$strength - mean(teams$strength)
+
+teams$names <- factor(teams$names, levels = teams$names[order(teams$strength)])
+
+ggplot(teams, 
+       aes(
+         x = strength,
+         y = names
+       )) +
+  geom_bar(stat = "identity")
+```
 
 ## R packages
 
