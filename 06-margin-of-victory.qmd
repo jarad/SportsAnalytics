@@ -457,7 +457,7 @@ handball2024b <- handball2024 |>
 ```{r handball-model}
 # Convert team names into factors
 teams <- data.frame(
-  names = unique(handball2024b$TeamA, handball2024b$TeamB) |>
+  names = c(handball2024b$TeamA, handball2024b$TeamB) |>
     unique() |>
     sort() |>
     factor()
@@ -477,7 +477,10 @@ X_h <- handball2024b |>
 dim(X_h) # n_games x n_teams
 
 m <- lm(handball2024b$margin ~ X_h - 1) # remove the home field advantage
+summary(m)$sigma
+```
 
+```{r handball-strength}
 teams$strength <- coef(m)
 teams$strength[nrow(teams)] <- 0
 teams$strength <- teams$strength - mean(teams$strength)
@@ -492,6 +495,205 @@ ggplot(teams,
   geom_bar(stat = "identity")
 ```
 
+The distribution of scores around the expected score.
+
+```{r handball-residuals}
+ggplot() +
+  geom_histogram(
+    aes(
+      x = m$residuals,
+        y = after_stat(density)
+    ), # Get frequency rather than count
+    binwidth = 1,
+  ) +
+  stat_function(
+    fun  = dnorm, 
+    args = list(
+      mean = mean(m$residuals),
+      sd   = sd(m$residuals)
+    ), 
+    color = "red"
+  ) +
+  labs(
+    x = 'Actual Score - Expected Score',
+    y = 'Density',
+    title = 'Handball Score Variability'
+  )
+```
+
+I was expecting these residuals to be centered at 0,
+but I fit a model that did not include an intercept
+(since there was no clear home field). 
+Perhaps an intercept was needed?
+
+```{r handball-intercept}
+# Refit model with intercept
+m <- lm(handball2024b$margin ~ X_h) 
+summary(m)$coefficients[1,]
+```
+
+It appears the intercept is significant. 
+Taking a look at the data, there appears to be a Venue listed and this Venue
+would provide information about a possible home-field advantage.
+The analysis here would likely need to be a bit more complex as the home-field
+advantage should only be listed when a team is actually playing at home. 
+
+```{r handball-venue}
+handball2024b |> 
+  select(TeamA, TeamB, Venue) |> 
+  as.data.frame()
+```
+
+### College Baseball 2024
+
+```{r baseball-data-tmp}
+baseball <- read.csv("data/college_baseball_2024.csv")
+```
+
+Let's take a look at these data. 
+(Really I got quite a way in the analysis and realized an issue, 
+so now I'm back fixing up the data.)
+
+```{r baseball-data-exploratory}
+str(baseball)
+
+sort(unique(c(baseball$Team_1, baseball$Team_2)))
+sort(unique(baseball$Home_Field)) # there are neutral sites
+
+# Compared to sports we have been looking at baseball scores are relatively low
+# with most scores 10 or below
+table(c(baseball$Score_1, baseball$Score_2))
+```
+
+Let's deal explicitly with neutral sites. 
+
+
+
+
+```{r baseball-data}
+baseball2024 <- baseball |>
+  
+  # Create home/away teams and scores
+  # for neutral sites, home/away will be arbitrary
+  mutate(
+    Home_Field = gsub("@", "", Home_Field),
+    home_is_Team_1 =                        # this is used repeatedly below
+      Home_Field == "neutral" | 
+        Home_Field == Team_1,  
+    
+    # Set the teams
+    home = ifelse(home_is_Team_1, Team_1, Team_2),
+    away = ifelse(home_is_Team_1, Team_2, Team_1),
+    
+    # Set the scores
+    home_score = ifelse(home_is_Team_1, Score_1, Score_2),
+    away_score = ifelse(home_is_Team_1, Score_2, Score_1),
+    
+    margin = home_score - away_score,
+    
+    Date = as.Date(Dates, format = "%m/%d/%Y")
+  ) |>
+  select(Date, Home_Field, home, away, home_score, away_score, margin)
+```
+
+Let's first check the graph connectedness. 
+
+```{r baseball-graph}
+p <- simpleNetwork(baseball2024, 
+                   height="100px", width="100px",        
+        Source = "away",                 # column number of source
+        Target = "home",                 # column number of target
+        linkDistance = 10,          # distance between node. Increase this value to have more space between nodes
+        charge = -900,                # numeric value indicating either the strength of the node repulsion (negative value) or attraction (positive value)
+        fontSize = 14,               # size of the node names
+        fontFamily = "serif",       # font og node names
+        linkColour = "#666",        # colour of edges, MUST be a common colour for the whole graph
+        nodeColour = "#69b3a2",     # colour of nodes, MUST be a common colour for the whole graph
+        opacity = 0.9,              # opacity of nodes. 0=transparent. 1=no transparency
+        zoom = T                    # Can you zoom on the figure?
+        )
+
+p
+```
+
+
+
+
+Let's build our model for margin of victory depending on team strength and
+include home-field advantage when it is relevant. 
+
+
+To do so, we will create an additional column in the X matrix that includes a
+home-field advantage only when playing on a home-field,
+i.e. not at a *neutral* site.
+Then, when we run the regression, we will not include an intercept. 
+
+
+```{r baseball-construct-model-matrix}
+# Construct factors for teams
+teams <- data.frame(
+  names = c(baseball2024$home, baseball2024$away) |>
+    unique() |>
+    sort() |>
+    factor()
+)
+
+baseball2024 <- baseball2024 |>
+  mutate(
+    home = factor(home, levels = teams$names),
+    away = factor(away, levels = teams$names)
+  )
+
+X_baseball <- 
+  cbind(
+    1 * !(baseball2024$Home_Field == "neutral"),
+    construct_model_matrix(baseball2024)
+  )
+
+colnames(X_baseball) <- c("home-field advantage", as.character(teams$names))
+
+rowSums(X_baseball) # home_field advantage has a 1 and neutral is 0
+colSums(X_baseball) # difference in number of home - away games
+head(X_baseball)
+```
+
+```{r baseball-model}
+m <- lm(baseball2024$margin ~ X_baseball - 1) # remove intercept
+summary(m)$sigma
+```
+
+```{r baseball-strengths}
+# Home field advantage
+coef(m)[1]
+
+# Team strengths
+strength <- coef(m)[-1]
+strength[length(strength)] <- 0
+
+teams <- teams |>
+  mutate(
+    strength = strength - mean(strength),
+    names    = factor(names, 
+                      levels = names[order(strength)])
+  ) |>
+  arrange(desc(strength))
+```
+
+```{r baseball-strength-plot}
+ggplot(teams,
+       aes(
+         x = strength,
+         y = names 
+       )) +
+  geom_point() +
+  labs(
+    x = "Strength",
+    y = "Team",
+    title = "2024 Big 12 College Baseball"
+  )
+```
+
 ## R packages
 
+Are there any or do we really have to do all of this by hand?
 

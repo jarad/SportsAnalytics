@@ -1,0 +1,124 @@
+Dates,Team_1,Score_1,Team_2,Score_2,Home_Field
+3/17/2023,Kansas State,8,Baylor,1,@Baylor
+3/17/2023,Texas Christian,13,Oklahoma,5,@Oklahoma
+3/17/2023,Texas Tech,8,Oklahoma State,7,@Texas Tech
+3/18/2023,Baylor,8,Kansas State,4,@Baylor
+3/18/2023,Oklahoma State,9,Texas Tech,4,@Texas Tech
+3/18/2023,Oklahoma,3,Texas Christian,1,@Oklahoma
+3/19/2023,Baylor,8,Kansas State,4,@Baylor
+3/19/2023,Oklahoma,7,Texas Christian,5,@Oklahoma
+3/19/2023,Texas Tech,12,Oklahoma State,1,@Texas Tech
+3/24/2023,Kansas State,7,Oklahoma,1,@Kansas State
+3/24/2023,Oklahoma State,11,Baylor,9,@Oklahoma State
+3/24/2023,Texas Christian,8,Kansas,6,@Texas Christian
+3/24/2023,Texas,6,Texas Tech,2,@Texas
+3/25/2023,Kansas State,7,Oklahoma,6,@Kansas State
+3/25/2023,Oklahoma State,15,Baylor,8,@Oklahoma State
+3/25/2023,Texas Christian,18,Kansas,5,@Texas Christian
+3/25/2023,Texas,6,Texas Tech,5,@Texas
+3/26/2023,Kansas State,8,Oklahoma,7,@Kansas State
+3/26/2023,Oklahoma State,13,Baylor,2,@Oklahoma State
+3/26/2023,Texas Christian,14,Kansas,0,@Texas Christian
+3/26/2023,Texas,9,Texas Tech,8,@Texas
+3/31/2023,Kansas,12,Baylor,4,@Kansas
+3/31/2023,Texas Tech,20,Texas Christian,16,@Texas Tech
+3/31/2023,Texas,5,Oklahoma State,3,@Oklahoma State
+3/31/2023,West Virginia,8,Kansas State,3,@Kansas State
+4/1/2023,Kansas State,7,West Virginia,1,@Kansas State
+4/1/2023,Kansas,13,Baylor,6,@Kansas
+4/1/2023,Oklahoma State,4,Texas,1,@Oklahoma State
+4/1/2023,Texas Christian,10,Texas Tech,7,@Texas Tech
+4/2/2023,Kansas,5,Baylor,4,@Kansas
+4/2/2023,Oklahoma State,4,Texas,3,@Oklahoma State
+4/2/2023,Texas Tech,10,Texas Christian,5,@Texas Tech
+4/2/2023,West Virginia,10,Kansas State,6,@Kansas State
+4/6/2023,Baylor,10,Oklahoma,6,@Baylor
+4/6/2023,Oklahoma State,7,Texas Christian,6,@Texas Christian
+4/7/2023,Kansas,5,West Virginia,3,@West Virginia
+4/7/2023,Oklahoma,6,Baylor,3,@Baylor
+4/7/2023,Texas Christian,7,Oklahoma State,3,@Texas Christian
+4/7/2023,Texas,6,Kansas State,5,@Texas
+4/8/2023,Baylor,5,Oklahoma,3,@Baylor
+4/8/2023,Kansas State,6,Texas,5,@Texas
+4/8/2023,Kansas,10,West Virginia,7,@West Virginia
+4/8/2023,Texas Christian,12,Oklahoma State,5,@Texas Christian
+4/9/2023,Texas,8,Kansas State,2,@Texas
+4/9/2023,West Virginia,12,Kansas,3,@West Virginia
+4/14/2023,Kansas State,5,Kansas,4,@Kansas
+4/14/2023,Texas Tech,13,Oklahoma,7,@Oklahoma
+4/14/2023,Texas,11,Baylor,9,@Baylor
+4/14/2023,West Virginia,6,Oklahoma State,3,@Oklahoma State
+4/15/2023,Baylor,10,Texas,9,@Baylor
+4/15/2023,Kansas State,6,Kansas,1,@Kansas
+4/15/2023,Texas Tech,9,Oklahoma,5,@Oklahoma
+4/15/2023,West Virginia,9,Oklahoma State,5,@Oklahoma State
+4/16/2023,Kansas State,21,Kansas,18,@Kansas
+4/16/2023,Oklahoma State,11,West Virginia,6,@Oklahoma State
+4/16/2023,Oklahoma,12,Texas Tech,2,@Oklahoma
+4/16/2023,Texas,7,Baylor,6,@Baylor
+4/18/2023,Oklahoma State,19,Oklahoma,8,@Oklahoma State
+4/21/2023,Oklahoma State,15,Kansas,10,@Kansas
+4/21/2023,Oklahoma,2,Texas,1,@Texas
+4/21/2023,Texas Tech,10,Baylor,1,@Texas Tech
+4/21/2023,West Virginia,5,Texas Christian,4,@West Virginia
+4/22/2023,Baylor,6,Texas Tech,4,@Texas Tech
+4/22/2023,Oklahoma State,14,Kansas,3,@Kansas
+4/22/2023,Oklahoma,6,Texas,4,@Texas
+4/22/2023,Oklahoma,9,Texas,6,@Texas
+4/22/2023,Texas Tech,14,Baylor,9,@Texas Tech
+4/22/2023,West Virginia,7,Texas Christian,4,@West Virginia
+4/23/2023,Oklahoma State,8,Kansas,3,@Kansas
+4/23/2023,West Virginia,17,Texas Christian,7,@West Virginia
+4/28/2023,Kansas State,3,Texas Tech,2,@Kansas State
+4/28/2023,Kansas,8,Oklahoma,2,@Oklahoma
+4/28/2023,West Virginia,5,Baylor,4,@Baylor
+4/29/2023,Oklahoma,11,Kansas,6,@Oklahoma
+4/29/2023,Texas Tech,5,Kansas State,2,@Kansas State
+4/29/2023,Texas,8,Texas Christian,4,@Texas Christian
+4/29/2023,West Virginia,10,Baylor,0,@Baylor
+4/30/2023,Kansas State,10,Texas Tech,8,@Kansas State
+4/30/2023,Oklahoma,7,Kansas,4,@Oklahoma
+4/30/2023,Texas,3,Texas Christian,2,@Texas Christian
+4/30/2023,West Virginia,18,Baylor,4,@Baylor
+5/1/2023,Texas Christian,15,Texas,7,@Texas Christian
+5/5/2023,Kansas,10,Texas,4,@Kansas
+5/5/2023,West Virginia,9,Oklahoma,3,@West Virginia
+5/6/2023,Oklahoma,6,West Virginia,3,@West Virginia
+5/6/2023,Texas,6,Kansas,2,@Kansas
+5/7/2023,Texas,7,Kansas,6,@Kansas
+5/7/2023,West Virginia,9,Oklahoma,3,@West Virginia
+5/12/2023,Kansas State,10,Oklahoma State,9,@Oklahoma State
+5/12/2023,Texas Christian,5,Baylor,1,@Texas Christian
+5/12/2023,Texas Tech,5,West Virginia,2,@West Virginia
+5/13/2023,Oklahoma State,19,Kansas State,5,@Oklahoma State
+5/13/2023,Texas Christian,2,Baylor,1,@Texas Christian
+5/13/2023,West Virginia,17,Texas Tech,2,@West Virginia
+5/14/2023,Oklahoma State,12,Kansas State,2,@Oklahoma State
+5/14/2023,Texas Christian,10,Baylor,4,@Texas Christian
+5/14/2023,West Virginia,5,Texas Tech,3,@West Virginia
+5/18/2023,Kansas State,7,Texas Christian,6,@Kansas State
+5/18/2023,Kansas,3,Texas Tech,1,@Texas Tech
+5/18/2023,Oklahoma State,13,Oklahoma,2,@Oklahoma
+5/18/2023,Texas,12,West Virginia,2,@Texas
+5/19/2023,Oklahoma,5,Oklahoma State,0,@Oklahoma
+5/19/2023,Texas Christian,8,Kansas State,1,@Kansas State
+5/19/2023,Texas Tech,8,Kansas,7,@Texas Tech
+5/19/2023,Texas,10,West Virginia,4,@Texas
+5/20/2023,Oklahoma State,11,Oklahoma,1,@Oklahoma
+5/20/2023,Texas Christian,4,Kansas State,3,@Kansas State
+5/20/2023,Texas Tech,15,Kansas,1,@Texas Tech
+5/20/2023,Texas,7,West Virginia,3,@Texas
+5/24/2023,Kansas,6,Texas,3,@neutral
+5/24/2023,Oklahoma,9,Oklahoma State,5,@neutral
+5/24/2023,Texas Christian,16,Kansas State,3,@neutral
+5/24/2023,Texas Tech,6,West Virginia,2,@neutral
+5/25/2023,Kansas State,6,Texas,0,@neutral
+5/25/2023,Oklahoma State,3,West Virginia,2,@neutral
+5/25/2023,Texas Christian,14,Kansas,4,@neutral
+5/25/2023,Texas Tech,10,Oklahoma,9,@neutral
+5/26/2023,Kansas State,7,Kansas,1,@neutral
+5/26/2023,Oklahoma State,8,Oklahoma,3,@neutral
+5/27/2023,Oklahoma State,6,Texas Tech,5,@neutral
+5/27/2023,Oklahoma State,8,Texas Tech,1,@neutral
+5/27/2023,Texas Christian,6,Kansas State,3,@neutral
+5/28/2023,Texas Christian,12,Oklahoma State,5,@neutral
