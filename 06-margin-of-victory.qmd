@@ -54,21 +54,28 @@ X
 
 A model for the margin of victory is 
 
-$$M_i = \eta + \theta_H - \theta_A + \epsilon_i$$
+$$M_g = \eta + \theta_{H[g]} - \theta_{A[g]} + \epsilon_g$$
 
-where 
+where, for game $g$,
 
-- $M_i$ is the margin of victory for game $i$,
-- $\eta$ is the home field advantage,
-- $\theta_{H[i]}$ is the ability of the home team in game $i$, and 
-- $\theta_{A[i]}$ is the ability of the away team in game $i$.
+- $M_g$ is the margin of victory,
+- $H[g]$ is the ID for the home team, 
+- $A[g]$ is the ID for the away team,
+- $\epsilon_g$ is a random error.
 
-The $\epsilon_i$ is a random noise term. 
-This term arises because if two teams play each other repeatedly we would 
+This error arises because if two teams play each other repeatedly we would 
 expect that the score in their games would be random around the expected
 margin of victory.
 
-$$E[M_i] = \eta + \theta_H - \theta_A.$$
+The parameters are 
+
+- $\eta$ is the home field advantage 
+- $\theta_t$ is the strength of team $t$. 
+
+The expected margin of victory when team $H$ is at home playing
+against team $A$ is 
+
+$$E[M] = \eta + \theta_{H} - \theta_{A}.$$
 
 
 ### Identifiability
