@@ -1,0 +1,4 @@
+# Win-Tie-Loss Models
+
+This is a stub for models that estimate team/player strength in sports where
+ties are possible. 

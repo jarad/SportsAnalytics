@@ -18,6 +18,8 @@ book:
       chapters:
       - 06-margin-of-victory.qmd
       - 07-win-loss.qmd
+      - win-tie-loss.qmd
+      - offense-defense-rating.qmd
       - 08-player-contribution.qmd
     - summary.qmd
     - references.qmd
