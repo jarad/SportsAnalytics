@@ -1,0 +1,192 @@
+Week,HomeTeam,AwayTeam,HomeScore,AwayScore,OT,NeutralSite,Playoffs
+1,Ames,Cedar Falls,0,31,0,0,0
+1,Ankeny,Ankeny Centennial,0,20,0,0,0
+1,Bettendorf,Pleasant Valley,20,0,0,0,0
+1,Cedar Rapids Jefferson,Cedar Rapids Kennedy,0,34,0,0,0
+1,Cedar Rapids Washington,Prairie Cedar Rapids,6,41,0,0,0
+1,Council Bluffs Thomas Jefferson,Sioux City West,7,34,0,0,0
+1,Davenport Central,Muscatine,6,23,0,0,0
+1,Davenport North,Dubuque Hempstead,11,10,0,0,0
+1,Des Moines East,Des Moines Lincoln,26,40,0,0,0
+1,Des Moines North,Marshalltown,26,50,0,0,0
+1,Des Moines Roosevelt,Des Moines Hoover,31,14,0,0,0
+1,Dubuque Senior,Linn-Mar Marion,7,6,0,0,0
+1,Mason City,Fort Dodge,0,48,0,0,0
+1,Ottumwa,Burlington,32,26,0,0,0
+1,Sioux City North,Council Bluffs Abraham Lincoln,47,20,0,0,0
+1,Urbandale,Johnston,14,34,0,0,0
+1,Valley West Des Moines,Southeast Polk,21,7,0,0,0
+1,Waukee,Dowling Catholic West Des Moines,14,48,0,0,0
+2,Ankeny Centennial,Urbandale,41,0,0,0,0
+2,Bettendorf,Iowa City West,10,7,0,0,0
+2,Cedar Falls,Iowa City City High,47,0,0,0,0
+2,Cedar Rapids Kennedy,Linn-Mar Marion,33,7,0,0,0
+2,Council Bluffs Thomas Jefferson,Sioux City North,99,81,0,0,0
+2,Des Moines East,Des Moines North,44,0,0,0,0
+2,Des Moines Lincoln,Des Moines Roosevelt,21,7,0,0,0
+2,Dowling Catholic West Des Moines,Valley West Des Moines,6,20,0,1,0
+2,Dubuque Hempstead,Cedar Rapids Washington,55,10,0,0,0
+2,Fort Dodge,Ames,52,24,0,0,0
+2,Indianola,Des Moines Hoover,44,13,0,0,0
+2,Johnston,Ankeny,14,9,0,0,0
+2,Marshalltown,Ottumwa,36,6,0,0,0
+2,Muscatine,Cedar Rapids Jefferson,40,37,1,0,0
+2,Prairie Cedar Rapids,Pleasant Valley,49,42,0,0,0
+2,Sioux City East,Sioux City West,17,6,0,0,0
+2,Southeast Polk,Waukee,14,21,0,0,0
+2,Waterloo West,Mason City,34,0,0,0,0
+3,Ankeny,Cedar Falls,7,28,0,0,0
+3,Cedar Rapids Washington,Dubuque Senior,10,0,0,0,0
+3,Davenport Central,Davenport North,42,15,0,0,0
+3,Davenport West,Muscatine,13,14,0,0,0
+3,Des Moines Hoover,Des Moines North,21,18,0,0,0
+3,Des Moines Roosevelt,Des Moines East,0,27,0,0,0
+3,Dubuque Hempstead,Bettendorf,21,29,0,0,0
+3,Indianola,Fort Dodge,27,21,0,0,0
+3,Iowa City City High,Ames,0,35,0,0,0
+3,Iowa City West,Southeast Polk,31,17,0,0,0
+3,Johnston,Dowling Catholic West Des Moines,0,27,0,0,0
+3,Linn-Mar Marion,Cedar Rapids Jefferson,33,14,0,0,0
+3,Marshalltown,Mason City,45,13,0,0,0
+3,Prairie Cedar Rapids,Waukee,6,33,0,0,0
+3,Sioux City West,Sioux City North,54,33,0,0,0
+3,Urbandale,Des Moines Lincoln,56,33,0,0,0
+3,Valley West Des Moines,Cedar Rapids Kennedy,42,0,0,0,0
+3,Waterloo West,Ankeny Centennial,7,49,0,0,0
+4,Ames,Marshalltown,21,13,0,0,0
+4,Ankeny,Des Moines Roosevelt,42,0,0,0,0
+4,Cedar Falls,Bettendorf,29,23,0,0,0
+4,Cedar Rapids Jefferson,Cedar Rapids Washington,14,54,0,0,0
+4,Cedar Rapids Kennedy,Prairie Cedar Rapids,14,30,0,0,0
+4,Council Bluffs Abraham Lincoln,Sioux City East,0,49,0,0,0
+4,Davenport West,Davenport North,10,22,0,0,0
+4,Des Moines Hoover,Waterloo West,28,60,0,0,0
+4,Des Moines Lincoln,Indianola,6,42,0,0,0
+4,Dowling Catholic West Des Moines,Ankeny Centennial,7,14,0,0,0
+4,Dubuque Senior,Iowa City West,14,48,0,0,0
+4,Iowa City City High,Dubuque Hempstead,23,22,0,0,0
+4,Linn-Mar Marion,Urbandale,16,17,0,0,0
+4,Muscatine,Johnston,7,42,0,0,0
+4,Pleasant Valley,Davenport Central,27,7,0,0,0
+4,Southeast Polk,Des Moines East,40,25,0,0,0
+4,Waukee,Valley West Des Moines,27,28,0,0,0
+5,Ames,Des Moines North,40,6,0,0,0
+5,Ankeny Centennial,Marshalltown,49,7,0,0,0
+5,Bettendorf,Cedar Rapids Washington,35,0,0,0,0
+5,Cedar Rapids Jefferson,Waterloo West,21,19,0,0,0
+5,Cedar Rapids Kennedy,Davenport West,47,7,0,0,0
+5,Council Bluffs Thomas Jefferson,Valley West Des Moines,0,56,0,0,0
+5,Davenport Central,Burlington,44,7,0,0,0
+5,Davenport North,Linn-Mar Marion,13,7,0,0,0
+5,Des Moines East,Johnston,14,31,0,0,0
+5,Des Moines Roosevelt,Sioux City West,25,20,0,0,0
+5,Dowling Catholic West Des Moines,Ankeny,42,0,0,0,0
+5,Dubuque Hempstead,Cedar Falls,0,39,0,0,0
+5,Iowa City West,Pleasant Valley,20,14,0,0,0
+5,Mason City,Waukee,7,63,0,0,0
+5,Muscatine,Iowa City City High,46,17,0,0,0
+5,Ottumwa,Indianola,7,42,0,0,0
+5,Prairie Cedar Rapids,Dubuque Senior,42,20,0,0,0
+5,Sioux City East,Des Moines Hoover,38,25,0,0,0
+5,Sioux City North,Des Moines Lincoln,24,61,0,0,0
+5,Southeast Polk,Fort Dodge,21,22,0,0,0
+5,Urbandale,Council Bluffs Abraham Lincoln,49,6,0,0,0
+6,Ankeny Centennial,Southeast Polk,31,10,0,0,0
+6,Burlington,Bettendorf,0,65,0,0,0
+6,Cedar Falls,Cedar Rapids Jefferson,38,7,0,0,0
+6,Cedar Rapids Washington,Cedar Rapids Kennedy,11,21,0,0,0
+6,Council Bluffs Abraham Lincoln,Ames,3,49,0,0,0
+6,Davenport West,Davenport Central,7,31,0,0,0
+6,Des Moines Hoover,Ankeny,14,51,0,0,0
+6,Des Moines Lincoln,Dowling Catholic West Des Moines,0,43,0,0,0
+6,Des Moines North,Council Bluffs Thomas Jefferson,12,34,0,0,0
+6,Dubuque Hempstead,Prairie Cedar Rapids,0,35,0,0,0
+6,Fort Dodge,Des Moines Roosevelt,51,13,0,0,0
+6,Indianola,Mason City,42,0,0,0,0
+6,Iowa City City High,Davenport North,21,24,1,0,0
+6,Johnston,Ottumwa,52,6,0,0,0
+6,Linn-Mar Marion,Iowa City West,7,41,0,0,0
+6,Marshalltown,Sioux City West,41,14,0,0,0
+6,Pleasant Valley,Muscatine,49,35,0,0,0
+6,Sioux City East,Sioux City North,35,11,0,0,0
+6,Valley West Des Moines,Urbandale,49,10,0,0,0
+6,Waterloo West,Dubuque Senior,20,27,0,0,0
+6,Waukee,Des Moines East,27,19,0,0,0
+7,Ames,Council Bluffs Thomas Jefferson,41,29,0,0,0
+7,Ankeny,Des Moines Lincoln,47,0,0,0,0
+7,Bettendorf,Cedar Rapids Kennedy,41,14,0,0,0
+7,Burlington,Davenport West,27,28,0,0,0
+7,Cedar Rapids Jefferson,Prairie Cedar Rapids,6,41,0,0,0
+7,Council Bluffs Abraham Lincoln,Valley West Des Moines,0,77,0,0,0
+7,Davenport Central,Cedar Rapids Washington,27,17,0,0,0
+7,Davenport North,Iowa City West,0,35,0,0,0
+7,Dowling Catholic West Des Moines,Sioux City East,52,0,0,0,0
+7,Dubuque Senior,Dubuque Hempstead,20,26,0,0,0
+7,Fort Dodge,Ankeny Centennial,44,49,0,0,0
+7,Iowa City City High,Pleasant Valley,21,38,0,0,0
+7,Johnston,Indianola,28,0,0,0,0
+7,Marshalltown,Des Moines Roosevelt,15,20,0,0,0
+7,Mason City,Des Moines East,14,55,0,0,0
+7,Muscatine,Linn-Mar Marion,10,28,0,0,0
+7,Ottumwa,Waukee,0,50,0,0,0
+7,Sioux City North,Des Moines Hoover,48,23,0,0,0
+7,Sioux City West,Southeast Polk,6,77,0,0,0
+7,Urbandale,Des Moines North,49,13,0,0,0
+7,Waterloo West,Cedar Falls,0,55,0,0,0
+8,Ankeny,Sioux City North,62,7,0,0,0
+8,Cedar Falls,Dubuque Senior,41,0,0,0,0
+8,Cedar Rapids Kennedy,Davenport Central,32,10,0,0,0
+8,Cedar Rapids Washington,Burlington,61,21,0,0,0
+8,Council Bluffs Thomas Jefferson,Urbandale,10,24,0,0,0
+8,Davenport West,Bettendorf,3,48,0,0,0
+8,Des Moines East,Ottumwa,40,18,0,0,0
+8,Des Moines Hoover,Dowling Catholic West Des Moines,0,59,0,0,0
+8,Des Moines Lincoln,Sioux City East,32,42,0,0,0
+8,Des Moines North,Council Bluffs Abraham Lincoln,16,30,0,0,0
+8,Des Moines Roosevelt,Ankeny Centennial,6,56,0,0,0
+8,Dubuque Hempstead,Cedar Rapids Jefferson,35,0,0,0,0
+8,Indianola,Waukee,14,42,0,0,0
+8,Iowa City West,Muscatine,58,14,0,0,0
+8,Linn-Mar Marion,Iowa City City High,49,14,0,0,0
+8,Mason City,Johnston,0,52,0,0,0
+8,Pleasant Valley,Davenport North,44,6,0,0,0
+8,Prairie Cedar Rapids,Waterloo West,70,14,0,0,0
+8,Sioux City West,Fort Dodge,13,68,0,0,0
+8,Southeast Polk,Marshalltown,56,7,0,0,0
+8,Valley West Des Moines,Ames,45,0,0,0,0
+9,Ames,Urbandale,10,21,0,0,0
+9,Ankeny Centennial,Sioux City West,61,0,0,0,0
+9,Burlington,Cedar Rapids Kennedy,20,55,0,0,0
+9,Cedar Rapids Washington,Davenport West,21,10,0,0,0
+9,Council Bluffs Abraham Lincoln,Council Bluffs Thomas Jefferson,21,42,0,0,0
+9,Davenport Central,Bettendorf,7,28,0,0,0
+9,Davenport North,Muscatine,14,21,0,0,0
+9,Des Moines East,Indianola,42,16,0,0,0
+9,Des Moines Hoover,Des Moines Lincoln,7,41,0,0,0
+9,Des Moines North,Valley West Des Moines,0,69,0,0,0
+9,Dowling Catholic West Des Moines,Sioux City North,74,20,0,0,0
+9,Dubuque Senior,Cedar Rapids Jefferson,21,20,0,0,0
+9,Iowa City West,Iowa City City High,54,13,0,0,0
+9,Marshalltown,Fort Dodge,6,46,0,0,0
+9,Ottumwa,Mason City,21,6,0,0,0
+9,Pleasant Valley,Linn-Mar Marion,35,28,0,0,0
+9,Prairie Cedar Rapids,Cedar Falls,14,28,0,0,0
+9,Sioux City East,Ankeny,6,42,0,0,0
+9,Southeast Polk,Des Moines Roosevelt,48,0,0,0,0
+9,Waterloo West,Dubuque Hempstead,14,28,0,0,0
+9,Waukee,Johnston,31,30,0,0,0
+10,Ankeny Centennial,Southeast Polk,17,21,0,0,1
+10,Valley West Des Moines,Ankeny,24,21,0,0,1
+10,Cedar Falls,Indianola,48,14,0,0,1
+10,Iowa City West,Cedar Rapids Kennedy,38,14,0,0,1
+10,Bettendorf,Pleasant Valley,31,14,0,0,1
+10,Waukee,Urbandale,42,22,0,0,1
+10,Dowling Catholic West Des Moines,Fort Dodge,41,0,0,0,1
+10,Johnston,Prairie Cedar Rapids,28,14,0,0,1
+11,Valley West Des Moines,Dowling Catholic West Des Moines,9,31,0,0,1
+11,Johnston,Southeast Polk,7,21,0,0,1
+11,Cedar Falls,Waukee,40,7,0,1,1
+11,Iowa City West,Bettendorf,28,43,0,0,1
+12,Bettendorf,Dowling Catholic West Des Moines,34,41,1,1,1
+12,Cedar Falls,Southeast Polk,26,12,0,1,1
+13,Cedar Falls,Dowling Catholic West Des Moines,16,22,0,1,1
