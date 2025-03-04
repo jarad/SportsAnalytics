@@ -5,7 +5,7 @@ library("tidyverse"); theme_set(theme_bw())
 library("ggResidpanel")
 ```
 
-A simple example of margin-of-vectory data is this fictitious collection of 4 
+A simple example of margin-of-victory data is this fictitious collection of 4 
 teams that have played 5 games. 
 
 ```{r data}
@@ -202,10 +202,10 @@ One drawback of these types of models is that the model is transitive,
 but this may not reflect reality. 
 The transitivity property in this model is 
 $$\theta_A > \theta_B \quad\&\quad \theta_B > \theta_C \,\implies\, \theta_A > \theta_C.$$
-In words, this means that if Team 1 is better than Team 2 and 
-Team 2 is better than Team 3, 
-then Team 1 must be better than Team 3. 
-This precludes the possibility that Team 3 could match up well against Team 1. 
+In words, this means that if Team A is better than Team B and 
+Team B is better than Team C, 
+then Team A must be better than Team C. 
+This precludes the possibility that Team C could match up well against Team A. 
 
 As an example, consider the following set of teams and games.
 ```{r non-transitive-data}
