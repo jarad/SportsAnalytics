@@ -1,5 +1,14 @@
 # Announcements
 
+## 2025-03-04
+
+- Project Ideas
+- Homework due Thursday
+  - Harder than previous
+- Discussion Board Post
+  - none this week
+  - next week Player Ability data
+
 ## 2025-02-27
 
 - Homework out tomorrow (due next Thursday)
