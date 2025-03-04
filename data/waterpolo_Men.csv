@@ -1,0 +1,326 @@
+Date,TeamA,TeamB,ScoreA,ScoreB,Sex,TournamentName,year,Venue,Winner
+8/25/2018,Japan,China,12,4,M,AsianGames,2018,Indonesia,Japan
+8/25/2018,Saudi Arabia,Indonesia,12,12,M,AsianGames,2018,Indonesia,Tie
+8/25/2018,Singapore,Iran,5,11,M,AsianGames,2018,Indonesia,Iran
+8/25/2018,South Korea,Kazakhstan,9,16,M,AsianGames,2018,Indonesia,Kazakhstan
+8/26/2018,Indonesia,China,2,19,M,AsianGames,2018,Indonesia,China
+8/26/2018,Iran,South Korea,16,11,M,AsianGames,2018,Indonesia,Iran
+8/26/2018,Saudi Arabia,Hong Kong,12,6,M,AsianGames,2018,Indonesia,Saudi Arabia
+8/27/2018,China,Hong Kong,23,3,M,AsianGames,2018,Indonesia,China
+8/27/2018,Indonesia,Japan,7,24,M,AsianGames,2018,Indonesia,Japan
+8/27/2018,Kazakhstan,Singapore,15,4,M,AsianGames,2018,Indonesia,Kazakhstan
+8/28/2018,China,Saudi Arabia,17,5,M,AsianGames,2018,Indonesia,China
+8/28/2018,Hong Kong,Japan,0,23,M,AsianGames,2018,Indonesia,Japan
+8/28/2018,Kazakhstan,Iran,9,5,M,AsianGames,2018,Indonesia,Kazakhstan
+8/29/2018,Hong Kong,Indonesia,8,11,M,AsianGames,2018,Indonesia,Indonesia
+8/29/2018,Japan,Saudi Arabia,20,4,M,AsianGames,2018,Indonesia,Japan
+8/29/2018,Singapore,South Korea,7,10,M,AsianGames,2018,Indonesia,South Korea
+8/30/2018,Iran,Saudi Arabia,15,7,M,AsianGames,2018,Indonesia,Iran
+8/30/2018,Kazakhstan,Indonesia,20,4,M,AsianGames,2018,Indonesia,Kazakhstan
+8/30/2018,Singapore,Japan,6,28,M,AsianGames,2018,Indonesia,Japan
+8/30/2018,South Korea,China,4,12,M,AsianGames,2018,Indonesia,China
+8/31/2018,China,Kazakhstan,8,9,M,AsianGames,2018,Indonesia,Kazakhstan
+8/31/2018,Iran,Japan,7,18,M,AsianGames,2018,Indonesia,Japan
+8/31/2018,Saudi Arabia,Singapore,5,6,M,AsianGames,2018,Indonesia,Singapore
+8/31/2018,South Korea,Indonesia,15,7,M,AsianGames,2018,Indonesia,South Korea
+9/1/2018,Iran,China,16,15,M,AsianGames,2018,Indonesia,Iran
+9/1/2018,Japan,Kazakhstan,7,8,M,AsianGames,2018,Indonesia,Kazakhstan
+9/1/2018,Saudi Arabia,Indonesia,12,8,M,AsianGames,2018,Indonesia,Saudi Arabia
+9/1/2018,Singapore,South Korea,10,12,M,AsianGames,2018,Indonesia,South Korea
+10/23/2018,Croatia,Romania,17,4,M,WaterPoloWorldLeague,2019,Croatia,Croatia
+10/23/2018,Malta,Russia,5,18,M,WaterPoloWorldLeague,2019,Malta,Russia
+10/23/2018,Montenegro,Italy,11,8,M,WaterPoloWorldLeague,2019,Montenegro,Montenegro
+10/23/2018,Netherlands,Ukraine,15,5,M,WaterPoloWorldLeague,2019,Netherlands,Netherlands
+10/23/2018,Spain,Greece,5,7,M,WaterPoloWorldLeague,2019,Spain,Greece
+10/24/2018,Hungary,Germany,17,9,M,WaterPoloWorldLeague,2019,Hungary,Hungary
+11/12/2018,France,Montenegro,9,13,M,WaterPoloWorldLeague,2019,France,Montenegro
+11/12/2018,Greece,Ukraine,25,2,M,WaterPoloWorldLeague,2019,Greece,Greece
+11/12/2018,Hungary,Malta,24,8,M,WaterPoloWorldLeague,2019,Hungary,Hungary
+11/12/2018,Netherlands,Spain,7,13,M,WaterPoloWorldLeague,2019,Netherlands,Spain
+11/12/2018,Russia,Germany,14,8,M,WaterPoloWorldLeague,2019,Russia,Russia
+11/12/2018,Serbia,Croatia,11,9,M,WaterPoloWorldLeague,2019,Serbia,Serbia
+11/13/2018,Germany,Malta,23,9,M,WaterPoloWorldLeague,2019,Germany,Germany
+11/13/2018,Greece,Netherlands,14,9,M,WaterPoloWorldLeague,2019,Greece,Greece
+11/13/2018,Italy,France,12,3,M,WaterPoloWorldLeague,2019,Italy,Italy
+11/13/2018,Romania,Serbia,6,13,M,WaterPoloWorldLeague,2019,Romania,Serbia
+11/13/2018,Russia,Hungary,8,15,M,WaterPoloWorldLeague,2019,Russia,Hungary
+11/13/2018,Ukraine,Spain,3,11,M,WaterPoloWorldLeague,2019,Ukraine,Spain
+1/29/2019,Germany,Hungary,16,17,M,WaterPoloWorldLeague,2019,Germany,Hungary
+1/29/2019,Greece,Spain,4,7,M,WaterPoloWorldLeague,2019,Greece,Spain
+1/29/2019,Italy,Montenegro,11,10,M,WaterPoloWorldLeague,2019,Italy,Italy
+1/29/2019,Romania,Croatia,7,11,M,WaterPoloWorldLeague,2019,Romania,Croatia
+1/29/2019,Russia,Malta,23,4,M,WaterPoloWorldLeague,2019,Russia,Russia
+1/29/2019,Ukraine,Netherlands,5,15,M,WaterPoloWorldLeague,2019,Ukraine,Netherlands
+2/19/2019,France,Italy,4,6,M,WaterPoloWorldLeague,2019,France,Italy
+2/19/2019,Hungary,Russia,10,8,M,WaterPoloWorldLeague,2019,Hungary,Hungary
+2/19/2019,Malta,Germany,9,18,M,WaterPoloWorldLeague,2019,Malta,Germany
+2/19/2019,Netherlands,Greece,6,12,M,WaterPoloWorldLeague,2019,Netherlands,Greece
+2/19/2019,Serbia,Romania,13,6,M,WaterPoloWorldLeague,2019,Serbia,Serbia
+2/19/2019,Spain,Ukraine,17,2,M,WaterPoloWorldLeague,2019,Spain,Spain
+3/12/2019,Croatia,Serbia,12,9,M,WaterPoloWorldLeague,2019,Croatia,Croatia
+3/12/2019,Germany,Russia,10,18,M,WaterPoloWorldLeague,2019,Germany,Russia
+3/12/2019,Malta,Hungary,8,24,M,WaterPoloWorldLeague,2019,Malta,Hungary
+3/12/2019,Montenegro,France,10,8,M,WaterPoloWorldLeague,2019,Montenegro,Montenegro
+3/12/2019,Spain,Netherlands,14,7,M,WaterPoloWorldLeague,2019,Spain,Spain
+3/12/2019,Ukraine,Greece,5,24,M,WaterPoloWorldLeague,2019,Ukraine,Greece
+3/27/2019,Canada,South Africa,18,4,M,WaterPoloWorldLeague,2019,Australia,Canada
+3/27/2019,China,New Zealand,14,7,M,WaterPoloWorldLeague,2019,Australia,China
+3/27/2019,Japan,Australia,15,17,M,WaterPoloWorldLeague,2019,Australia,Australia
+3/27/2019,Kazakhstan,Argentina,11,5,M,WaterPoloWorldLeague,2019,Australia,Kazakhstan
+3/28/2019,Argentina,New Zealand,14,9,M,WaterPoloWorldLeague,2019,Australia,Argentina
+3/28/2019,China,Kazakhstan,16,15,M,WaterPoloWorldLeague,2019,Australia,China
+3/28/2019,Japan,Canada,13,10,M,WaterPoloWorldLeague,2019,Australia,Japan
+3/28/2019,South Africa,Australia,6,19,M,WaterPoloWorldLeague,2019,Australia,Australia
+3/29/2019,Australia,New Zealand,15,4,M,WaterPoloWorldLeague,2019,Australia,Australia
+3/29/2019,Canada,China,11,10,M,WaterPoloWorldLeague,2019,Australia,Canada
+3/29/2019,Japan,Argentina,13,8,M,WaterPoloWorldLeague,2019,Australia,Japan
+3/29/2019,South Africa,Kazakhstan,8,14,M,WaterPoloWorldLeague,2019,Australia,Kazakhstan
+3/30/2019,Argentina,South Africa,12,6,M,WaterPoloWorldLeague,2019,Australia,Argentina
+3/30/2019,Canada,Australia,7,14,M,WaterPoloWorldLeague,2019,Australia,Australia
+3/30/2019,China,New Zealand,11,8,M,WaterPoloWorldLeague,2019,Australia,China
+3/30/2019,Japan,Kazakhstan,12,7,M,WaterPoloWorldLeague,2019,Australia,Japan
+3/31/2019,Argentina,China,7,5,M,WaterPoloWorldLeague,2019,Australia,Argentina
+3/31/2019,Japan,Australia,8,10,M,WaterPoloWorldLeague,2019,Australia,Australia
+3/31/2019,Kazakhstan,Canada,4,9,M,WaterPoloWorldLeague,2019,Australia,Canada
+3/31/2019,South Africa,New Zealand,8,10,M,WaterPoloWorldLeague,2019,Australia,New Zealand
+4/5/2019,Greece,Croatia,11,13,M,WaterPoloWorldLeague,2019,Croatia,Croatia
+4/5/2019,Hungary,Montenegro,11,7,M,WaterPoloWorldLeague,2019,Croatia,Hungary
+4/5/2019,Italy,Russia,11,9,M,WaterPoloWorldLeague,2019,Croatia,Italy
+4/5/2019,Spain,Serbia,13,12,M,WaterPoloWorldLeague,2019,Croatia,Spain
+4/6/2019,Hungary,Italy,12,11,M,WaterPoloWorldLeague,2019,Croatia,Hungary
+4/6/2019,Montenegro,Russia,15,9,M,WaterPoloWorldLeague,2019,Croatia,Montenegro
+4/6/2019,Serbia,Greece,14,10,M,WaterPoloWorldLeague,2019,Croatia,Serbia
+4/6/2019,Spain,Croatia,9,12,M,WaterPoloWorldLeague,2019,Croatia,Croatia
+4/7/2019,Hungary,Croatia,10,8,M,WaterPoloWorldLeague,2019,Croatia,Hungary
+4/7/2019,Italy,Spain,7,9,M,WaterPoloWorldLeague,2019,Croatia,Spain
+4/7/2019,Montenegro,Serbia,16,14,M,WaterPoloWorldLeague,2019,Croatia,Montenegro
+4/7/2019,Russia,Greece,14,15,M,WaterPoloWorldLeague,2019,Croatia,Greece
+6/18/2019,Australia,Serbia,8,12,M,WaterPoloWorldLeague,2019,Serbia,Serbia
+6/18/2019,Croatia,Kazakhstan,20,4,M,WaterPoloWorldLeague,2019,Serbia,Croatia
+6/18/2019,Hungary,Canada,9,10,M,WaterPoloWorldLeague,2019,Serbia,Canada
+6/18/2019,Japan,Spain,10,18,M,WaterPoloWorldLeague,2019,Serbia,Spain
+6/19/2019,Australia,Kazakhstan,14,5,M,WaterPoloWorldLeague,2019,Serbia,Australia
+6/19/2019,Croatia,Serbia,10,11,M,WaterPoloWorldLeague,2019,Serbia,Serbia
+6/19/2019,Hungary,Spain,15,12,M,WaterPoloWorldLeague,2019,Serbia,Hungary
+6/19/2019,Japan,Canada,17,7,M,WaterPoloWorldLeague,2019,Serbia,Japan
+6/20/2019,Canada,Spain,5,12,M,WaterPoloWorldLeague,2019,Serbia,Spain
+6/20/2019,Croatia,Australia,11,9,M,WaterPoloWorldLeague,2019,Serbia,Croatia
+6/20/2019,Hungary,Japan,13,9,M,WaterPoloWorldLeague,2019,Serbia,Hungary
+6/20/2019,Kazakhstan,Serbia,6,20,M,WaterPoloWorldLeague,2019,Serbia,Serbia
+6/21/2019,Canada,Serbia,5,20,M,WaterPoloWorldLeague,2019,Serbia,Serbia
+6/21/2019,Hungary,Australia,15,16,M,WaterPoloWorldLeague,2019,Serbia,Australia
+6/21/2019,Japan,Croatia,14,20,M,WaterPoloWorldLeague,2019,Serbia,Croatia
+6/21/2019,Spain,Kazakhstan,19,10,M,WaterPoloWorldLeague,2019,Serbia,Spain
+6/22/2019,Australia,Serbia,11,16,M,WaterPoloWorldLeague,2019,Serbia,Serbia
+6/22/2019,Croatia,Spain,10,8,M,WaterPoloWorldLeague,2019,Serbia,Croatia
+6/22/2019,Hungary,Canada,15,8,M,WaterPoloWorldLeague,2019,Serbia,Hungary
+6/22/2019,Japan,Kazakhstan,13,12,M,WaterPoloWorldLeague,2019,Serbia,Japan
+6/23/2019,Australia,Spain,11,10,M,WaterPoloWorldLeague,2019,Serbia,Australia
+6/23/2019,Canada,Kazakhstan,16,17,M,WaterPoloWorldLeague,2019,Serbia,Kazakhstan
+6/23/2019,Hungary,Japan,15,13,M,WaterPoloWorldLeague,2019,Serbia,Hungary
+6/23/2019,Serbia,Croatia,12,11,M,WaterPoloWorldLeague,2019,Serbia,Serbia
+7/15/2019,Brazil,Italy,5,14,M,WorldChampionship,2019,South Korea,Italy
+7/15/2019,Croatia,Australia,14,4,M,WorldChampionship,2019,South Korea,Croatia
+7/15/2019,Germany,Japan,9,9,M,WorldChampionship,2019,South Korea,Tie
+7/15/2019,New Zealand,Hungary,4,24,M,WorldChampionship,2019,South Korea,Hungary
+7/15/2019,Serbia,Montenegro,10,10,M,WorldChampionship,2019,South Korea,Tie
+7/15/2019,South Africa,Spain,3,23,M,WorldChampionship,2019,South Korea,Spain
+7/15/2019,South Korea,Greece,3,26,M,WorldChampionship,2019,South Korea,Greece
+7/15/2019,United States,Kazakhstan,16,7,M,WorldChampionship,2019,South Korea,United States
+7/17/2019,Australia,Kazakhstan,17,8,M,WorldChampionship,2019,South Korea,Australia
+7/17/2019,Brazil,Germany,8,15,M,WorldChampionship,2019,South Korea,Germany
+7/17/2019,Greece,Montenegro,10,10,M,WorldChampionship,2019,South Korea,Tie
+7/17/2019,Hungary,Spain,13,11,M,WorldChampionship,2019,South Korea,Hungary
+7/17/2019,Japan,Italy,7,9,M,WorldChampionship,2019,South Korea,Italy
+7/17/2019,Serbia,South Korea,22,2,M,WorldChampionship,2019,South Korea,Serbia
+7/17/2019,South Africa,New Zealand,8,8,M,WorldChampionship,2019,South Korea,Tie
+7/17/2019,United States,Croatia,7,17,M,WorldChampionship,2019,South Korea,Croatia
+7/19/2019,Brazil,Japan,9,11,M,WorldChampionship,2019,South Korea,Japan
+7/19/2019,Croatia,Kazakhstan,21,5,M,WorldChampionship,2019,South Korea,Croatia
+7/19/2019,Germany,Italy,7,8,M,WorldChampionship,2019,South Korea,Italy
+7/19/2019,New Zealand,Spain,3,23,M,WorldChampionship,2019,South Korea,Spain
+7/19/2019,Serbia,Greece,9,3,M,WorldChampionship,2019,South Korea,Serbia
+7/19/2019,South Africa,Hungary,5,23,M,WorldChampionship,2019,South Korea,Hungary
+7/19/2019,South Korea,Montenegro,6,24,M,WorldChampionship,2019,South Korea,Montenegro
+7/19/2019,United States,Australia,12,11,M,WorldChampionship,2019,South Korea,United States
+7/21/2019,Greece,United States,11,9,M,WorldChampionship,2019,South Korea,Greece
+7/21/2019,Montenegro,Australia,11,13,M,WorldChampionship,2019,South Korea,Australia
+7/21/2019,New Zealand,Brazil,8,12,M,WorldChampionship,2019,South Korea,Brazil
+7/21/2019,South Africa,Germany,5,25,M,WorldChampionship,2019,South Korea,Germany
+7/21/2019,South Korea,Kazakhstan,4,17,M,WorldChampionship,2019,South Korea,Kazakhstan
+7/21/2019,Spain,Japan,15,7,M,WorldChampionship,2019,South Korea,Spain
+7/23/2019,Croatia,Germany,10,8,M,WorldChampionship,2019,South Korea,Croatia
+7/23/2019,Hungary,Australia,10,9,M,WorldChampionship,2019,South Korea,Hungary
+7/23/2019,Italy,Greece,7,6,M,WorldChampionship,2019,South Korea,Italy
+7/23/2019,Kazakhstan,Brazil,8,9,M,WorldChampionship,2019,South Korea,Brazil
+7/23/2019,Montenegro,Japan,14,7,M,WorldChampionship,2019,South Korea,Montenegro
+7/23/2019,Serbia,Spain,9,12,M,WorldChampionship,2019,South Korea,Spain
+7/23/2019,South Korea,New Zealand,17,16,M,WorldChampionship,2019,South Korea,South Korea
+7/23/2019,United States,South Africa,20,3,M,WorldChampionship,2019,South Korea,United States
+7/25/2019,Australia,Greece,9,8,M,WorldChampionship,2019,South Korea,Australia
+7/25/2019,Hungary,Italy,10,12,M,WorldChampionship,2019,South Korea,Italy
+7/25/2019,Japan,South Africa,15,5,M,WorldChampionship,2019,South Korea,Japan
+7/25/2019,Montenegro,United States,14,15,M,WorldChampionship,2019,South Korea,United States
+7/25/2019,Serbia,Germany,17,16,M,WorldChampionship,2019,South Korea,Serbia
+7/25/2019,Spain,Croatia,6,5,M,WorldChampionship,2019,South Korea,Spain
+7/27/2019,Croatia,Hungary,10,7,M,WorldChampionship,2019,South Korea,Croatia
+7/27/2019,Germany,Greece,6,11,M,WorldChampionship,2019,South Korea,Greece
+7/27/2019,Serbia,Australia,13,9,M,WorldChampionship,2019,South Korea,Serbia
+7/27/2019,Spain,Italy,5,10,M,WorldChampionship,2019,South Korea,Italy
+8/4/2019,Canada,Puerto Rico,20,7,M,PanAmericanGames,2019,Peru,Canada
+8/4/2019,Cuba,United States,6,21,M,PanAmericanGames,2019,Peru,United States
+8/4/2019,Mexico,Argentina,11,13,M,PanAmericanGames,2019,Peru,Argentina
+8/4/2019,Peru,Brazil,2,14,M,PanAmericanGames,2019,Peru,Brazil
+8/5/2019,Canada,United States,11,13,M,PanAmericanGames,2019,Peru,United States
+8/5/2019,Cuba,Puerto Rico,10,8,M,PanAmericanGames,2019,Peru,Cuba
+8/5/2019,Mexico,Brazil,5,10,M,PanAmericanGames,2019,Peru,Brazil
+8/5/2019,Peru,Argentina,6,12,M,PanAmericanGames,2019,Peru,Argentina
+8/6/2019,Brazil,Argentina,12,7,M,PanAmericanGames,2019,Peru,Brazil
+8/6/2019,Cuba,Canada,11,20,M,PanAmericanGames,2019,Peru,Canada
+8/6/2019,Peru,Mexico,8,14,M,PanAmericanGames,2019,Peru,Mexico
+8/6/2019,United States,Puerto Rico,24,1,M,PanAmericanGames,2019,Peru,United States
+8/8/2019,Canada,Mexico,13,11,M,PanAmericanGames,2019,Peru,Canada
+8/8/2019,Cuba,Argentina,7,9,M,PanAmericanGames,2019,Peru,Argentina
+8/8/2019,Puerto Rico,Brazil,4,15,M,PanAmericanGames,2019,Peru,Brazil
+8/8/2019,United States,Peru,24,2,M,PanAmericanGames,2019,Peru,United States
+8/9/2019,Argentina,United States,1,17,M,PanAmericanGames,2019,Peru,United States
+8/9/2019,Canada,Brazil,8,7,M,PanAmericanGames,2019,Peru,Canada
+8/9/2019,Cuba,Peru,17,5,M,PanAmericanGames,2019,Peru,Cuba
+8/9/2019,Mexico,Puerto Rico,14,15,M,PanAmericanGames,2019,Peru,Puerto Rico
+8/10/2019,Brazil,Argentina,9,6,M,PanAmericanGames,2019,Peru,Brazil
+8/10/2019,Canada,United States,6,18,M,PanAmericanGames,2019,Peru,United States
+8/10/2019,Mexico,Peru,16,5,M,PanAmericanGames,2019,Peru,Mexico
+8/10/2019,Puerto Rico,Cuba,7,8,M,PanAmericanGames,2019,Peru,Cuba
+11/12/2019,Greece,Italy,6,9,M,WaterPoloWorldLeague,2020,Greece,Italy
+11/12/2019,Hungary,Russia,14,6,M,WaterPoloWorldLeague,2020,Hungary,Hungary
+11/12/2019,Montenegro,Ukraine,23,3,M,WaterPoloWorldLeague,2020,Montenegro,Montenegro
+11/12/2019,Netherlands,Serbia,7,12,M,WaterPoloWorldLeague,2020,Netherlands,Serbia
+11/25/2019,Spain,Ukraine,20,8,M,WaterPoloWorldLeague,2020,Spain,Spain
+12/17/2019,Italy,Georgia,14,3,M,WaterPoloWorldLeague,2020,Italy,Italy
+12/17/2019,Russia,France,13,12,M,WaterPoloWorldLeague,2020,Russia,Russia
+12/29/2019,Serbia,Croatia,15,11,M,WaterPoloWorldLeague,2020,Serbia,Serbia
+1/14/2020,France,Georgia,7,9,M,EuropeanChampionship,2020,Hungary,Georgia
+1/14/2020,Germany,Croatia,9,17,M,EuropeanChampionship,2020,Hungary,Croatia
+1/14/2020,Italy,Greece,10,6,M,EuropeanChampionship,2020,Hungary,Italy
+1/14/2020,Malta,Spain,7,23,M,EuropeanChampionship,2020,Hungary,Spain
+1/14/2020,Romania,Netherlands,8,9,M,EuropeanChampionship,2020,Hungary,Netherlands
+1/14/2020,Serbia,Russia,13,9,M,EuropeanChampionship,2020,Hungary,Serbia
+1/14/2020,Slovakia,Montenegro,4,15,M,EuropeanChampionship,2020,Hungary,Montenegro
+1/14/2020,Turkey,Hungary,5,19,M,EuropeanChampionship,2020,Hungary,Hungary
+1/16/2020,France,Italy,7,10,M,EuropeanChampionship,2020,Hungary,Italy
+1/16/2020,Germany,Slovakia,8,5,M,EuropeanChampionship,2020,Hungary,Germany
+1/16/2020,Greece,Georgia,17,10,M,EuropeanChampionship,2020,Hungary,Greece
+1/16/2020,Hungary,Spain,11,11,M,EuropeanChampionship,2020,Hungary,Tie
+1/16/2020,Malta,Turkey,10,13,M,EuropeanChampionship,2020,Hungary,Turkey
+1/16/2020,Montenegro,Croatia,10,11,M,EuropeanChampionship,2020,Hungary,Croatia
+1/16/2020,Romania,Serbia,7,15,M,EuropeanChampionship,2020,Hungary,Serbia
+1/16/2020,Russia,Netherlands,15,9,M,EuropeanChampionship,2020,Hungary,Russia
+1/18/2020,France,Greece,10,12,M,EuropeanChampionship,2020,Hungary,Greece
+1/18/2020,Germany,Montenegro,3,10,M,EuropeanChampionship,2020,Hungary,Montenegro
+1/18/2020,Italy,Georgia,18,6,M,EuropeanChampionship,2020,Hungary,Italy
+1/18/2020,Malta,Hungary,0,26,M,EuropeanChampionship,2020,Hungary,Hungary
+1/18/2020,Romania,Russia,11,10,M,EuropeanChampionship,2020,Hungary,Romania
+1/18/2020,Serbia,Netherlands,11,4,M,EuropeanChampionship,2020,Hungary,Serbia
+1/18/2020,Slovakia,Croatia,4,16,M,EuropeanChampionship,2020,Hungary,Croatia
+1/18/2020,Turkey,Spain,7,24,M,EuropeanChampionship,2020,Hungary,Spain
+1/20/2020,Germany,Spain,6,12,M,EuropeanChampionship,2020,Hungary,Spain
+1/20/2020,Montenegro,Turkey,17,6,M,EuropeanChampionship,2020,Hungary,Montenegro
+1/20/2020,Netherlands,France,8,9,M,EuropeanChampionship,2020,Hungary,France
+1/20/2020,Romania,Greece,7,14,M,EuropeanChampionship,2020,Hungary,Greece
+1/20/2020,Russia,Georgia,14,13,M,EuropeanChampionship,2020,Hungary,Russia
+1/20/2020,Slovakia,Malta,8,4,M,EuropeanChampionship,2020,Hungary,Slovakia
+1/22/2020,Croatia,Greece,14,11,M,EuropeanChampionship,2020,Hungary,Croatia
+1/22/2020,Germany,Romania,15,10,M,EuropeanChampionship,2020,Hungary,Germany
+1/22/2020,Hungary,Russia,14,10,M,EuropeanChampionship,2020,Hungary,Hungary
+1/22/2020,Italy,Montenegro,8,10,M,EuropeanChampionship,2020,Hungary,Montenegro
+1/22/2020,Malta,Netherlands,9,19,M,EuropeanChampionship,2020,Hungary,Netherlands
+1/22/2020,Serbia,Spain,9,10,M,EuropeanChampionship,2020,Hungary,Spain
+1/22/2020,Slovakia,France,6,9,M,EuropeanChampionship,2020,Hungary,France
+1/22/2020,Turkey,Georgia,6,12,M,EuropeanChampionship,2020,Hungary,Georgia
+1/24/2020,Croatia,Spain,8,9,M,EuropeanChampionship,2020,Hungary,Spain
+1/24/2020,Georgia,Germany,8,9,M,EuropeanChampionship,2020,Hungary,Germany
+1/24/2020,Italy,Russia,14,12,M,EuropeanChampionship,2020,Hungary,Italy
+1/24/2020,Montenegro,Hungary,8,10,M,EuropeanChampionship,2020,Hungary,Hungary
+1/24/2020,Serbia,Greece,12,9,M,EuropeanChampionship,2020,Hungary,Serbia
+1/24/2020,Turkey,Romania,3,20,M,EuropeanChampionship,2020,Hungary,Romania
+1/26/2020,Hungary,Spain,14,13,M,EuropeanChampionship,2020,Hungary,Hungary
+1/26/2020,Italy,Serbia,7,8,M,EuropeanChampionship,2020,Hungary,Serbia
+1/26/2020,Montenegro,Croatia,10,9,M,EuropeanChampionship,2020,Hungary,Montenegro
+1/26/2020,Russia,Greece,9,11,M,EuropeanChampionship,2020,Hungary,Greece
+2/10/2020,Serbia,Spain,11,13,M,WaterPoloWorldLeague,2020,Hungary,Spain
+2/11/2020,Croatia,Netherlands,16,7,M,WaterPoloWorldLeague,2020,Croatia,Croatia
+2/11/2020,France,Hungary,15,10,M,WaterPoloWorldLeague,2020,France,France
+2/11/2020,Georgia,Greece,7,19,M,WaterPoloWorldLeague,2020,Georgia,Greece
+2/11/2020,Spain,Montenegro,6,11,M,WaterPoloWorldLeague,2020,Spain,Montenegro
+1/8/2021,France,Greece,3,12,M,WaterPoloWorldLeague,2020,Hungary,Greece
+1/8/2021,Italy,Hungary,9,8,M,WaterPoloWorldLeague,2020,Hungary,Italy
+1/8/2021,Montenegro,Croatia,15,14,M,WaterPoloWorldLeague,2020,Hungary,Montenegro
+1/9/2021,Croatia,Hungary,11,13,M,WaterPoloWorldLeague,2020,Hungary,Hungary
+1/9/2021,Montenegro,Italy,14,10,M,WaterPoloWorldLeague,2020,Hungary,Montenegro
+1/9/2021,Serbia,France,10,6,M,WaterPoloWorldLeague,2020,Hungary,Serbia
+1/9/2021,Spain,Greece,11,12,M,WaterPoloWorldLeague,2020,Hungary,Greece
+1/10/2021,Croatia,France,17,5,M,WaterPoloWorldLeague,2020,Hungary,Croatia
+1/10/2021,Hungary,Serbia,7,9,M,WaterPoloWorldLeague,2020,Hungary,Serbia
+1/10/2021,Italy,Spain,9,8,M,WaterPoloWorldLeague,2020,Hungary,Italy
+1/10/2021,Montenegro,Greece,7,12,M,WaterPoloWorldLeague,2020,Hungary,Greece
+2/14/2021,Canada,Brazil,11,7,M,OlympicQ,2021,Netherlands,Canada
+2/14/2021,Croatia,Romania,16,6,M,OlympicQ,2021,Netherlands,Croatia
+2/14/2021,France,Russia,12,13,M,OlympicQ,2021,Netherlands,Russia
+2/14/2021,Georgia,Greece,10,11,M,OlympicQ,2021,Netherlands,Greece
+2/14/2021,Netherlands,Germany,11,10,M,OlympicQ,2021,Netherlands,Netherlands
+2/15/2021,Croatia,Netherlands,25,8,M,OlympicQ,2021,Netherlands,Croatia
+2/15/2021,Germany,France,12,13,M,OlympicQ,2021,Netherlands,France
+2/15/2021,Greece,Brazil,15,8,M,OlympicQ,2021,Netherlands,Greece
+2/15/2021,Montenegro,Canada,21,7,M,OlympicQ,2021,Netherlands,Montenegro
+2/15/2021,Romania,Russia,9,9,M,OlympicQ,2021,Netherlands,Tie
+2/16/2021,Brazil,Montenegro,5,15,M,OlympicQ,2021,Netherlands,Montenegro
+2/16/2021,Canada,Georgia,11,14,M,OlympicQ,2021,Netherlands,Georgia
+2/16/2021,France,Croatia,10,13,M,OlympicQ,2021,Netherlands,Croatia
+2/16/2021,Netherlands,Romania,9,8,M,OlympicQ,2021,Netherlands,Netherlands
+2/16/2021,Russia,Germany,17,5,M,OlympicQ,2021,Netherlands,Russia
+2/17/2021,Croatia,Russia,13,14,M,OlympicQ,2021,Netherlands,Russia
+2/17/2021,Georgia,Brazil,12,8,M,OlympicQ,2021,Netherlands,Georgia
+2/17/2021,Greece,Montenegro,4,8,M,OlympicQ,2021,Netherlands,Montenegro
+2/17/2021,Netherlands,France,11,11,M,OlympicQ,2021,Netherlands,Tie
+2/17/2021,Romania,Germany,12,7,M,OlympicQ,2021,Netherlands,Romania
+2/18/2021,Canada,Greece,6,19,M,OlympicQ,2021,Netherlands,Greece
+2/18/2021,Croatia,Germany,22,8,M,OlympicQ,2021,Netherlands,Croatia
+2/18/2021,France,Romania,16,7,M,OlympicQ,2021,Netherlands,France
+2/18/2021,Montenegro,Georgia,11,9,M,OlympicQ,2021,Netherlands,Montenegro
+2/18/2021,Russia,Netherlands,11,10,M,OlympicQ,2021,Netherlands,Russia
+2/19/2021,Canada,Russia,9,17,M,OlympicQ,2021,Netherlands,Russia
+2/19/2021,Georgia,Croatia,6,15,M,OlympicQ,2021,Netherlands,Croatia
+2/19/2021,Greece,France,17,14,M,OlympicQ,2021,Netherlands,Greece
+2/19/2021,Montenegro,Netherlands,13,7,M,OlympicQ,2021,Netherlands,Montenegro
+2/20/2021,France,Canada,11,9,M,OlympicQ,2021,Netherlands,France
+2/20/2021,Greece,Russia,13,10,M,OlympicQ,2021,Netherlands,Greece
+2/20/2021,Montenegro,Croatia,14,12,M,OlympicQ,2021,Netherlands,Montenegro
+2/20/2021,Netherlands,Georgia,14,11,M,OlympicQ,2021,Netherlands,Netherlands
+2/21/2021,Croatia,Russia,25,24,M,OlympicQ,2021,Netherlands,Croatia
+2/21/2021,Georgia,Canada,18,10,M,OlympicQ,2021,Netherlands,Georgia
+2/21/2021,Montenegro,Greece,10,9,M,OlympicQ,2021,Netherlands,Montenegro
+2/21/2021,Netherlands,France,10,9,M,OlympicQ,2021,Netherlands,Netherlands
+6/26/2021,Greece,France,10,8,M,WaterPoloWorldLeague,2020,Georgia,Greece
+6/26/2021,Japan,Georgia,12,13,M,WaterPoloWorldLeague,2020,Georgia,Georgia
+6/26/2021,Kazakhstan,Italy,11,17,M,WaterPoloWorldLeague,2020,Georgia,Italy
+6/26/2021,Montenegro,United States,10,6,M,WaterPoloWorldLeague,2020,Georgia,Montenegro
+6/27/2021,Georgia,Montenegro,8,19,M,WaterPoloWorldLeague,2020,Georgia,Montenegro
+6/27/2021,Italy,Greece,11,8,M,WaterPoloWorldLeague,2020,Georgia,Italy
+6/27/2021,Japan,United States,7,15,M,WaterPoloWorldLeague,2020,Georgia,United States
+6/27/2021,Kazakhstan,France,11,12,M,WaterPoloWorldLeague,2020,Georgia,France
+6/28/2021,France,Italy,7,14,M,WaterPoloWorldLeague,2020,Georgia,Italy
+6/28/2021,Greece,Kazakhstan,14,9,M,WaterPoloWorldLeague,2020,Georgia,Greece
+6/28/2021,Montenegro,Japan,16,8,M,WaterPoloWorldLeague,2020,Georgia,Montenegro
+6/28/2021,United States,Georgia,13,9,M,WaterPoloWorldLeague,2020,Georgia,United States
+6/29/2021,France,United States,11,12,M,WaterPoloWorldLeague,2020,Georgia,United States
+6/29/2021,Greece,Georgia,20,8,M,WaterPoloWorldLeague,2020,Georgia,Greece
+6/29/2021,Italy,Japan,15,12,M,WaterPoloWorldLeague,2020,Georgia,Italy
+6/29/2021,Kazakhstan,Montenegro,6,18,M,WaterPoloWorldLeague,2020,Georgia,Montenegro
+6/30/2021,France,Japan,10,16,M,WaterPoloWorldLeague,2020,Georgia,Japan
+6/30/2021,Georgia,Kazakhstan,15,16,M,WaterPoloWorldLeague,2020,Georgia,Kazakhstan
+6/30/2021,Greece,Montenegro,4,8,M,WaterPoloWorldLeague,2020,Georgia,Montenegro
+6/30/2021,United States,Italy,10,8,M,WaterPoloWorldLeague,2020,Georgia,United States
+7/1/2021,Georgia,France,5,10,M,WaterPoloWorldLeague,2020,Georgia,France
+7/1/2021,Greece,Italy,10,8,M,WaterPoloWorldLeague,2020,Georgia,Greece
+7/1/2021,Kazakhstan,Japan,10,17,M,WaterPoloWorldLeague,2020,Georgia,Japan
+7/1/2021,Montenegro,United States,9,8,M,WaterPoloWorldLeague,2020,Georgia,Montenegro
