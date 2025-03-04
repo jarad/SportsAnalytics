@@ -6,6 +6,7 @@ of the home team winning the game.
 ```{r packages}
 library("tidyverse"); theme_set(theme_bw())
 library("DT")
+library("BradleyTerry2")
 ```
 
 A simple example of margin-of-victory data is this fictitious collection of 4 
@@ -416,11 +417,13 @@ players <- data.frame(
 ) 
 
 
-X_t <- tennis_filtered |>
+tennis_filtered_factored <- tennis_filtered |>
   mutate(
     Winner = factor(Winner, levels = players$names),
     Loser  = factor(Loser,  levels = players$names)
-  ) |>
+  ) 
+
+X_t <- tennis_filtered_factored |>
   construct_model_matrix("Winner", "Loser")
 ```
 
@@ -499,3 +502,31 @@ written by Ralph Bradley and Milton Terry [@bradley1952rank].
 - [BradleyTerry2](https://cran.r-project.org/web/packages/BradleyTerry2/index.html)
 - [BradleyTerryScalable](https://github.com/EllaKaye/BradleyTerryScalable)
 - [bpcs](https://davidissamattos.github.io/bpcs/)
+
+```{r tennis-bradley-terry}
+bt_m <- BradleyTerry2::BTm(player1 = Winner,
+            player2 = Loser,
+            data = tennis_filtered_factored)
+
+summary(bt_m)
+```
+
+```{r bt-abilities-table}
+BradleyTerry2::BTabilities(bt_m) |> 
+  datatable(
+    filter = "top"
+  )
+```
+
+```{r bt-abilities-plot}
+d <- BradleyTerry2::BTabilities(bt_m) |> as.data.frame()
+d$name <- rownames(d)
+
+
+ggplot(d,
+       aes(
+         x = ability,
+         y = name
+       )) +
+  geom_bar(stat = "identity")
+```
