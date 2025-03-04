@@ -5,6 +5,7 @@ of the home team winning the game.
 
 ```{r packages}
 library("tidyverse"); theme_set(theme_bw())
+library("DT")
 ```
 
 A simple example of margin-of-victory data is this fictitious collection of 4 
@@ -73,7 +74,6 @@ $$\mbox{logit}(\pi_g)
 
 where, for game $g$,
 
-- $M_g$ is the margin of victory,
 - $H[g]$ is the ID for the home team, and 
 - $A[g]$ is the ID for the away team.
 
@@ -89,11 +89,16 @@ $$\pi_g
 = \left\{ 1 + \exp[-\eta_g] \right\}^{-1}
 = \left\{ 1 + \exp[-(\eta + \theta_{H} - \theta_{A})] \right\}^{-1}$$
 
+```{r expit}
+expit <- function(eta) {
+  1 / (1 + exp(-eta))
+}
+```
 
 ### Identifiability
 
 Similar to the margin-of-victory models, 
-the individual $\theta$s are not *identifiable*, but only there 
+the individual $\theta$s are not *identifiable*, but only their 
 difference is. 
 
 ### Graph connectednss
@@ -102,7 +107,7 @@ Just like the margin of victory models we will also have identifiability
 issues if the graph isn't connected.
 If the graph is sparsely connected, as happens with conference play,
 then games that connect parts of the graph will have an outsized influence
-on the overall strength of teams. 
+on the overall estimate of team strength. 
 
 
 ### Separation
@@ -112,7 +117,7 @@ the margin-of-victory models is the issue of separation.
 
 ::: {.callout-note}
 ## Separation
-A *complete separation* in a win-loss models occurs when 
+A *complete separation* in a win-loss model occurs when 
 one team has either won or lost all of their games. 
 :::
 
@@ -162,7 +167,15 @@ That is, there is no information about specific matchups.
 
 ## Rating Systems
 
-### ELO System
+Anybody know of any purely win-loss ratings systems?
+Perhaps one of the tennis rating systems:
+
+- [National Tennis Rating Program (NTRP)](https://www.usta.com/en/home/coach-organize/tennis-tool-center/run-usta-programs/national/understanding-ntrp-ratings.html)
+- Universal Tennis Rating
+- World Tennis Number
+- ATP
+- WTA
+- ITF
 
 
 
@@ -203,10 +216,15 @@ p
 
 Overall this graph looks reasonably connected.
 
-```{r football-summaries}
+```{r football-proportion-home-wins}
 # Proportion home wins
 football |> summarize(p = mean(home_win))
+```
 
+So we don't have to worry about identifiability of the home-field advantage
+parameter. 
+
+```{r football-win-loss}
 # Team Win-Loss
 football |>
   tidyr::pivot_longer(
@@ -222,7 +240,10 @@ football |>
     loses   = n_games - wins,
     p       = wins/n_games
   ) |>
-  arrange(desc(p))
+  arrange(desc(p)) |>
+  datatable(
+    filter = "top"
+  )
 ```
 
 With these data, we have many teams that either have all wins or all loses. 
@@ -252,6 +273,11 @@ handball2024 <- read_csv("data/Handball_W_InternationalResults.csv",
   )
 ```
 
+I didn't bother calculating statistics here because due to the small number
+of games each team played, there will definitely be some teams that have 0 
+wins and some that have 0 loses. 
+
+
 
 ### Waterpolo
 
@@ -277,8 +303,12 @@ waterpolo |>
     loses = n - wins,
     p     = wins / n
   ) |>
-  arrange(desc(p))
+  arrange(desc(p)) |>
+  datatable(
+    filter = "top"
+  )
 ```
+
 
 
 ### Tennis
@@ -288,9 +318,12 @@ tennis <- read.csv("data/tennis.csv") |>
   mutate(
     Date = as.Date(Date)
   ) |>
+  # Select only 2019 games
   filter(Date > as.Date("2018-12-31")) |>
   select(Winner, Loser) 
 ```
+
+
 
 ```{r tennis-win-loss}
 tennis_win_loss <- tennis |>
@@ -309,7 +342,10 @@ tennis_win_loss <- tennis |>
   filter(n > 20) |>
   arrange(desc(p))
 
-tennis_win_loss
+tennis_win_loss |>
+  datatable(
+    filter = "top"
+  )
 ```
 
 Limit the data to only individuals who have played at least 20 games. 
@@ -338,10 +374,15 @@ tennis_filtered |>
     p     = wins / n
   ) |>
   # filter(n > 20) |>
-  arrange(desc(p))
-
+  arrange(desc(p)) |>
+  datatable(
+    filter = "top"
+  )
 ```
-Check graph
+
+Everybody now has at least 1 win and 1 loss. 
+
+Check graph to make sure it is connected. 
 
 ```{r tennis-graph}
 p <- simpleNetwork(tennis_filtered, 
@@ -360,11 +401,12 @@ p <- simpleNetwork(tennis_filtered,
 
 p
 ```
-This graph looks complete.
+
+This graph looks complete and well connected. 
+Perhaps this is unsurprising because the top tennis players play a lot of games
+against each other over the course of a year. 
 
 ```{r tennis-model-matrix}
-Xt <- construct_model_matrix(tennis_filtered, "Winner", "Loser")
-
 # Convert team names into factors
 players <- data.frame(
   names = c(tennis_filtered$Winner, tennis_filtered$Loser) |>
@@ -372,6 +414,7 @@ players <- data.frame(
     sort() |>
     factor()
 ) 
+
 
 X_t <- tennis_filtered |>
   mutate(
@@ -381,13 +424,21 @@ X_t <- tennis_filtered |>
   construct_model_matrix("Winner", "Loser")
 ```
 
+Check the model matrix
+
 ```{r tennis-check-model-matrix}
-dim(X_t)
-table(X_t)
-all(rowSums(X_t) == 0)
-all(rowSums(abs(X_t)) == 2)
-table(colSums(X_t))
+dim(X_t)                    # n_games x n_teams
+table(X_t)                  # make sure all entries are -1, 0, 1
+all(rowSums(X_t) == 0)      # each row has one winner and one loser
+all(rowSums(abs(X_t)) == 2) # ^
+table(colSums(X_t))         # for each player, number of wins - number of loses
 ```
+
+Finally, we can fit our logistic regression model. 
+For these data, we do not have a binary column that indicates the winner.
+Instead, we have a column that indicates the winner by name. 
+Thus, we will need to create a binary column that indicates the first
+column (named Winner) is the winner. 
 
 
 ```{r tennis-fit-model}
@@ -398,7 +449,7 @@ m <- glm(rep(TRUE, nrow(X_t)) ~ X_t - 1, # no home field
          family = binomial(link = "logit")) 
 
 tail(coef(m))         # includes last team as NA
-tail(summary(m)$coef) # notice only 89 rows, but 90 teams
+tail(summary(m)$coef) # notice only 89 rows, but there are 90 teams
 ```
 
 ```{r tennis-strength}
@@ -428,10 +479,6 @@ To calculate the probability that one player beats another we can calculate the
 difference in their strengths and then calculate the probability. 
 
 ```{r tennis-probability}
-expit <- function(eta) {
-  1 / (1 + exp(-eta))
-}
-
 diff <- players$strength[players$names == "Barty A."] -
   players$strength[players$names == "Halep S."]
 
