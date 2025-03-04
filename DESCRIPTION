@@ -10,6 +10,7 @@ Depends:
 Imports:
     BradleyTerry2,
     igraph,
+    lme4,
     plotly,
     quarto,
     tidyverse (>= 2.0.0)
