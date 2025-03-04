@@ -1,0 +1,14 @@
+# Head-to-head {.unnumbered}
+
+Many sports compete in a head-to-head manner where one team (player) plays
+against only one other team (player) at a time. 
+Given the score of a game, 
+it is clear how good the two teams are compared to each other, 
+but not necessarily clear how these teams matchup against other teams. 
+Thus, you need a collection of games to understand how good the teams are 
+relative to each other. 
+
+In this part, 
+we investigate start by constructing models for margin of victory and 
+win-loss to produce a team (player) strength rating. 
+We then move on to evaluate individual player contributions in a team sport. 

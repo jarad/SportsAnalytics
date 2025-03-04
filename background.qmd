@@ -1,0 +1,4 @@
+# Background {.unnumbered}
+
+This part is intended to provide the reader with the relevant background
+necessary to understand the models used in sports analytics. 

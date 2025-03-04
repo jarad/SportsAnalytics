@@ -7,12 +7,18 @@ book:
   date: "2025-02-28"
   chapters:
     - index.qmd
-    - 01-intro.qmd
-    - 02-distributions.qmd
-    - 03-regression.qmd
-    - 04-poisson-regression.qmd
-    - 05-logistic-regression.qmd
-    - 06-margin-of-victory.qmd
+    - part: background.qmd
+      chapters:
+      - 01-intro.qmd
+      - 02-distributions.qmd
+      - 03-regression.qmd
+      - 04-poisson-regression.qmd
+      - 05-logistic-regression.qmd
+    - part: head-to-head.qmd
+      chapters:
+      - 06-margin-of-victory.qmd
+      - 07-win-loss.qmd
+      - 08-player-contribution.qmd
     - summary.qmd
     - references.qmd
     - 99-data.qmd
