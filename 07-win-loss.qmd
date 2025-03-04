@@ -1,13 +1,454 @@
 # Win-Loss Models
 
+In this chapter, we investigate models when you only observe the binary outcome
+of the home team winning the game. 
+
+```{r packages}
+library("tidyverse"); theme_set(theme_bw())
+```
+
+A simple example of margin-of-victory data is this fictitious collection of 4 
+teams that have played 5 games. 
+
+```{r data}
+d <- tribble(
+  ~home, ~away, ~home_score, ~away_score, 
+      1,     2,          21,           7,
+      2,     3,          13,          14,
+      4,     1,           3,          28,
+      3,     4,          31,           0,
+      1,     3,          42,          10
+) |>
+  mutate(
+    home_win = home_score > away_score # binary indicator of who won
+  )
+```
+
+For the analysis that follows, 
+we will construct a model matrix $X$ where 
+$X_{g,t} = 1$ if team $t$ is the home team in game $g$,  
+$X_{g,t} = -1$ if team $t$ is the away team in game $g$,
+$X_{g,t} = 0$ otherwise.
+
+```{r model-matrix}
+construct_model_matrix <- function(d, homeCol = "home", awayCol = "away") {
+  n_games <- nrow(d)
+  n_teams <- length(unique(unlist(d[, homeCol], d[, awayCol])))
+  
+  m <- matrix(0, 
+              nrow = n_games, 
+              ncol = n_teams)
+  
+  for (g in 1:n_games) {
+    m[g, as.numeric(d[g, homeCol])] <-  1
+    m[g, as.numeric(d[g, awayCol])] <- -1
+  }
+  
+  return(m)
+}
+
+X <- construct_model_matrix(d)
+X
+```
+
+
+## Model
+
+A model for the indicator of who won is 
+
+$$H_g \stackrel{ind}{\sim} Ber(\pi_g)$$
+
+where 
+
+- $H_g$ is the indicator that the home team won game $g$ and
+- $\pi_g$ is the probability the home team would win game $g$.
+
+The probability of winning the game is then related to the team strength using
+the typical logit function. 
+
+$$\mbox{logit}(\pi_g) 
+= \log \left( \frac{\pi_g}{1-\pi_g} \right) 
+= \eta_g 
+= \eta + \theta_{H[g]} - \theta_{A[g]}$$
+
+where, for game $g$,
+
+- $M_g$ is the margin of victory,
+- $H[g]$ is the ID for the home team, and 
+- $A[g]$ is the ID for the away team.
+
+The parameters are 
+
+- $\eta$ is the home field advantage 
+- $\theta_t$ is the strength of team $t$. 
+
+The probability of team H winning at home against team A is. 
+
+$$\pi_g 
+= \mbox{expit}(\eta_g) 
+= \left\{ 1 + \exp[-\eta_g] \right\}^{-1}
+= \left\{ 1 + \exp[-(\eta + \theta_{H} - \theta_{A})] \right\}^{-1}$$
+
+
+### Identifiability
+
+Similar to the margin-of-victory models, 
+the individual $\theta$s are not *identifiable*, but only there 
+difference is. 
+
+### Graph connectednss
+
+Just like the margin of victory models we will also have identifiability 
+issues if the graph isn't connected.
+If the graph is sparsely connected, as happens with conference play,
+then games that connect parts of the graph will have an outsized influence
+on the overall strength of teams. 
+
+
+### Separation
+
+An issue that exists in these models for binary outcome that doesn't exist for
+the margin-of-victory models is the issue of separation. 
+
+::: {.callout-note}
+## Separation
+A *complete separation* in a win-loss models occurs when 
+one team has either won or lost all of their games. 
+:::
+
+If a team has won all of their games, then it is impossible to determine how
+good that team is. 
+Thus their team strength can be arbitrarily large. 
+
+```{r logistic-regression-separation-warning}
+m <- glm(d$home_win ~ X, family = binomial(link = "logit")) 
+```
+
+The warning in this output is an indication that separation has occurred. 
+
+```{r logistic-regression-separation-standard-error}
+summary(m)
+```
+
+The large standard errors are another indication that separation has occurred.
+Of course, it is best practice to make sure that every team has won and lost
+at least one game before you get to the step of fitting the model.
+
+Separation can also be observed if the home team wins every game. 
+In this situation, the home advantage parameter can be arbitrarily large. 
+
+Other separation situations can occur. 
+For example, imagine that there are two conferences and, in every 
+inter-conference game, one conference wins all the games. 
+In this situation, we have no information about how much better one 
+conference is than the other. 
+
+Separation is typical problem in logistic regression models, 
+but particularly a problem in the types of models we are using for win-loss
+data.
+
+
+### Transivity
+
+Similar to margin-of-victory models, 
+this win-loss model is transitive:
+if Team A is better than Team B and Team B is better than Team C then
+Team A is better than Team C. 
+That is, there is no information about specific matchups. 
+
+
+
+
+
+## Rating Systems
+
+### ELO System
+
+
+
+
+## Examples
+
+### Iowa High School Football
+
+```{r football-data}
+football <- read.csv("data/Iowa_High_School_Football_4A_Game_Scores_2018.csv") |>
+  filter(Playoffs == 0) |> # Not playoffs
+  mutate(
+    home_win = HomeScore > AwayScore
+  )
+```
+
+Let's take a look at the graph
+
+```{r football-graph}
+library("networkD3")
+
+p <- simpleNetwork(football, 
+                   height="100px", width="100px",        
+        Source = "AwayTeam",               
+        Target = "HomeTeam",            
+        linkDistance = 10,          # distance between node. Increase this value to have more space between nodes
+        charge = -900,                # numeric value indicating either the strength of the node repulsion (negative value) or attraction (positive value)
+        fontSize = 14,               # size of the node names
+        fontFamily = "serif",       # font og node names
+        linkColour = "#666",        # colour of edges, MUST be a common colour for the whole graph
+        nodeColour = "#69b3a2",     # colour of nodes, MUST be a common colour for the whole graph
+        opacity = 0.9,              # opacity of nodes. 0=transparent. 1=no transparency
+        zoom = T                    # Can you zoom on the figure?
+        )
+
+p
+```
+
+Overall this graph looks reasonably connected.
+
+```{r football-summaries}
+# Proportion home wins
+football |> summarize(p = mean(home_win))
+
+# Team Win-Loss
+football |>
+  tidyr::pivot_longer(
+    cols = c(`HomeTeam`, `AwayTeam`),
+    names_to = "Location",
+    values_to = "Team") |>
+  group_by(Team) |>
+  summarize(
+    n_games = n(),
+    wins    = sum( 
+      (home_win & Location == "HomeTeam") |
+      (!home_win & Location == "AwayTeam") ),
+    loses   = n_games - wins,
+    p       = wins/n_games
+  ) |>
+  arrange(desc(p))
+```
+
+With these data, we have many teams that either have all wins or all loses. 
+These data are not appropriate for these models. 
+
+
+
+### International Handball
+
+```{r handball-data}
+handball2024 <- read_csv("data/Handball_W_InternationalResults.csv",
+                     col_types = cols(
+                       ScoreA = col_double(),
+                       ScoreB = col_double(),
+                       year = col_integer(),
+                       Date = col_date(),
+                       .default = col_character()
+                     )) |>
+  filter(year == 2024,
+         !(TeamA %in% c("Romania", 
+                        "Bosnia and Herzegovina", 
+                        "Greece", 
+                        "Croatia"))) |>
+  mutate(
+    margin = ScoreA - ScoreB,
+    A_win  = margin > 0
+  )
+```
+
+
+### Waterpolo
+
+```{r waterpolo-data}
+waterpolo <- read.csv("data/waterpolo_Men.csv") |>
+  mutate(TeamA_win = Winner == TeamA) # Create binary win variable
+```
+
+```{r waterpolo-win-loss}
+waterpolo |>
+  tidyr::pivot_longer(
+    cols = c("TeamA", "TeamB"),
+    names_to = "AorB",
+    values_to = "Team"
+  ) |>
+  group_by(Team) |>
+  summarize(
+    n    = n(),
+    wins = sum(
+      (TeamA_win & AorB == "TeamA") |
+        (!TeamA_win & AorB == "TeamB")
+      ),
+    loses = n - wins,
+    p     = wins / n
+  ) |>
+  arrange(desc(p))
+```
+
+
+### Tennis
+
+```{r tennis-data}
+tennis <- read.csv("data/tennis.csv") |>
+  mutate(
+    Date = as.Date(Date)
+  ) |>
+  filter(Date > as.Date("2018-12-31")) |>
+  select(Winner, Loser) 
+```
+
+```{r tennis-win-loss}
+tennis_win_loss <- tennis |>
+  tidyr::pivot_longer(
+    cols = c("Winner", "Loser"),
+    names_to = "Win",
+    values_to = "Player"
+  ) |>
+  group_by(Player) |>
+  summarize(
+    n    = n(),
+    wins = sum(Win == "Winner"),
+    loses = n - wins,
+    p     = wins / n
+  ) |>
+  filter(n > 20) |>
+  arrange(desc(p))
+
+tennis_win_loss
+```
+
+Limit the data to only individuals who have played at least 20 games. 
+When we eliminate some games, 
+the individuals remaining may have less than 20 games. 
+The hope is that everybody has at least one win and one loss. 
+
+```{r tennis-data-filtered}
+tennis_filtered <- tennis |>
+  filter(
+    Winner %in% tennis_win_loss$Player & 
+      Loser %in% tennis_win_loss$Player
+  )
+
+tennis_filtered |>  
+  tidyr::pivot_longer(
+    cols = c("Winner", "Loser"),
+    names_to = "Win",
+    values_to = "Player"
+  ) |>
+  group_by(Player) |>
+  summarize(
+    n    = n(),
+    wins = sum(Win == "Winner"),
+    loses = n - wins,
+    p     = wins / n
+  ) |>
+  # filter(n > 20) |>
+  arrange(desc(p))
+
+```
+Check graph
+
+```{r tennis-graph}
+p <- simpleNetwork(tennis_filtered, 
+                   height="100px", width="100px",        
+        Source = "Winner",               
+        Target = "Loser",            
+        linkDistance = 10,          # distance between node. Increase this value to have more space between nodes
+        charge = -900,                # numeric value indicating either the strength of the node repulsion (negative value) or attraction (positive value)
+        fontSize = 14,               # size of the node names
+        fontFamily = "serif",       # font og node names
+        linkColour = "#666",        # colour of edges, MUST be a common colour for the whole graph
+        nodeColour = "#69b3a2",     # colour of nodes, MUST be a common colour for the whole graph
+        opacity = 0.9,              # opacity of nodes. 0=transparent. 1=no transparency
+        zoom = T                    # Can you zoom on the figure?
+        )
+
+p
+```
+This graph looks complete.
+
+```{r tennis-model-matrix}
+Xt <- construct_model_matrix(tennis_filtered, "Winner", "Loser")
+
+# Convert team names into factors
+players <- data.frame(
+  names = c(tennis_filtered$Winner, tennis_filtered$Loser) |>
+    unique() |>
+    sort() |>
+    factor()
+) 
+
+X_t <- tennis_filtered |>
+  mutate(
+    Winner = factor(Winner, levels = players$names),
+    Loser  = factor(Loser,  levels = players$names)
+  ) |>
+  construct_model_matrix("Winner", "Loser")
+```
+
+```{r tennis-check-model-matrix}
+dim(X_t)
+table(X_t)
+all(rowSums(X_t) == 0)
+all(rowSums(abs(X_t)) == 2)
+table(colSums(X_t))
+```
+
+
+```{r tennis-fit-model}
+# Fit logistic regression model
+# since columns are Winner/Loser the result should always be TRUE,
+# i.e. the first column won
+m <- glm(rep(TRUE, nrow(X_t)) ~ X_t - 1, # no home field
+         family = binomial(link = "logit")) 
+
+tail(coef(m))         # includes last team as NA
+tail(summary(m)$coef) # notice only 89 rows, but 90 teams
+```
+
+```{r tennis-strength}
+players$strength <- c(coef(m)[-length(coef(m))], 0)
+
+player_strength <- players |>
+  mutate(
+    names = factor(names, 
+                     levels = players$names[order(players$strength)]),
+    strength = strength - mean(strength)
+  ) |>
+  arrange(desc(strength))
+
+ggplot(player_strength,
+       aes(
+         x = strength,
+         y = names
+       )) +
+  geom_bar(stat = "identity") +
+  labs(
+    x = 'Strength',
+    y = 'Player',
+    title = "2019 Women's Tennis Players"
+  )
+```
+To calculate the probability that one player beats another we can calculate the
+difference in their strengths and then calculate the probability. 
+
+```{r tennis-probability}
+expit <- function(eta) {
+  1 / (1 + exp(-eta))
+}
+
+diff <- players$strength[players$names == "Barty A."] -
+  players$strength[players$names == "Halep S."]
+
+expit(diff)
+```
+
+
+
 
 
 ## R packages
 
 The models discussed in this chapter are often referred to as 
-Bradley-Terry models after the original manuscript written by 
+Bradley-Terry models after the 
+[1952 Biometrika article](https://doi.org/10.2307/2334029) 
+written by Ralph Bradley and Milton Terry [@bradley1952rank]. 
 
 - [BradleyTerry2](https://cran.r-project.org/web/packages/BradleyTerry2/index.html)
 - [BradleyTerryScalable](https://github.com/EllaKaye/BradleyTerryScalable)
-- [bpcs]()
--
+- [bpcs](https://davidissamattos.github.io/bpcs/)
