@@ -1,0 +1,17 @@
+{
+  "hash": "b3d15462e2928281e5540d4908f88c1c",
+  "result": {
+    "engine": "knitr",
+    "markdown": "# Distributions\n\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(\"ggplot2\"); theme_set(theme_bw())\n```\n:::\n\n\n\n\n\n## Discrete\n\n### Bernoulli\n\n### Binomial\n\n### Poisson\n\n### Negative binomial\n\n## Continuous\n\n### Normal\n\n### Logistic \n\nWe say a random variable $X$ has a logistic distribution if it has the \nfollowing probability density function. \n$$f(x) = \\frac{e^{-(x-\\mu)/\\sigma}}{\\sigma\\left(1 + e^{-(x-\\mu)/\\sigma} \\right)^2}$$\nwith \n\n- location parameter $\\mu$,\n- scale parameter $\\sigma > 0$, and\n- $-\\infty < x < \\infty$.\n\nWe write $X \\sim Lo(\\mu,\\sigma)$ and $E[X] = \\mu$ and $Var[X] = \\sigma^2 \\pi^2 / 3$. \n\nAs can be seen in the plot below, \nthe logistic distribution has much heavier tails than the normal distribution.\n\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Compare logistic and normal pdfs (same mean/variance)\nggplot(data.frame(x = c(-3, 3)),\n       aes(x = x)) +\n  stat_function(fun = dlogis, args = list(scale = 3 / pi^2)) + \n  stat_function(fun = dnorm, color = \"red\", linetype = \"dotted\") \n```\n\n::: {.cell-output-display}\n![](02-distributions_files/figure-html/logistic-pdf-1.png){width=672}\n:::\n:::\n\n\n\n\n\nThe logistic distribution gets is name from its cumulative distribution\nfunction which is a member of the logistic functions.\n\n$$F(x) = \\frac{1}{1 + e^{-(x-\\mu)/\\sigma}}$$\n\nThe logistic distribution can be utilized in a latent variable representation\nof logistic regression. \n",
+    "supporting": [
+      "02-distributions_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

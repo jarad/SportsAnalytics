@@ -1,4 +1,290 @@
 # Win-Tie-Loss Models
 
-This is a stub for models that estimate team/player strength in sports where
-ties are possible. 
+```{r packages}
+library("MASS") # polr: ordinal logistic regression model
+library("dplyr")
+library("tidyr")
+library("ggplot2"); theme_set(theme_bw())
+library("DT")
+```
+
+When sports allow ties, the statistical model used should accommodate the 
+ordinal nature of the data.
+$$ \mbox{Win} > \mbox{Tie} > \mbox{Loss} $$
+We can extend the win-loss logistic regression model to accommodate the 
+possibility of a Tie. 
+
+## Model
+
+To construct an ordinal logistic regression model, 
+we will start with a latent-variable representation of the logistic regression 
+model. 
+We will then add additional cut-points to represent the different possible 
+game outcomes. 
+
+### Latent Variable Logistic Regression
+
+Recall that our win-loss logistic regression model is 
+$$H_g\stackrel{ind}{\sim} Ber(\pi_g) \quad \mbox{logit}(\pi_g) 
+= \eta + \theta_{H[g]} - \theta_{A[g]}$$
+where 
+
+- $H_g$ is an indicator that the home team won game $g$ (0 if home team lost, 1 if home team won),
+- $\eta$ is the home advantage, and
+- $\theta_t$ is the strength of team $t$.
+
+An equivalent way to express this model introduces a 
+*latent variable* $Z_g$ with a logistic distribution.
+Given this latent variable, the outcome is deterministic. 
+Namely,
+$$H_g = \mathrm{I}(Z_g > 0) = \mathrm{I}(Z_g-\eta > -\eta).$$
+
+Then we assume $Z_g$ has a logistic distribution whose scale parameter,
+for identifiability, is set to a constant. 
+$$Z_g \stackrel{ind}{\sim} Lo(\mu_g, 1).$$
+The mean of this distribution is our typical model using home advantage and
+team strengths. 
+$$\mu_g = \eta + \theta_{H[g]} - \theta_{A[g]}.$$
+We can show $\pi_g = P(Z_g > 0)$ and thus these two representations of 
+the logistic distribution are equivalent. 
+Changing $\mu_g$ changes where the logistic distribution is centered on the 
+number line and therefore the $P(Z_g > 0)$.
+
+```{r logistic-win-loss}
+g <- ggplot(data.frame(x = c(-6, 10)),
+       aes(x = x)) +
+  stat_function(fun = dlogis, args = list(location = 1), 
+                xlim = c(-6, 0), geom = "area", fill = "red") +
+  stat_function(fun = dlogis, args = list(location = 1)) +
+  geom_vline(xintercept = 1, color = "gray", linetype = "dashed") +
+  geom_vline(xintercept = 0) +
+  labs(
+    y = "f(x)",
+    title = "X ~ Lo(1, 1)",
+    subtitle = "P(Win) = P(X > 0)"
+  ) +
+  annotate("text",  8, 0.2, label = "Win",  size = 8) +
+  annotate("text", -3, 0.2, label = "Loss", size = 8) 
+
+g
+```
+
+### Ordinal Logistic Regression
+
+To account for ties in addition to wins and losses, 
+we can include a cutpoint in addition to 0. 
+Modifying the above picture it may look something like this. 
+
+```{r logistic-win-tie-loss}
+g +
+  stat_function(fun = dlogis, args = list(location = 1), 
+                xlim = c(0, 5), geom = "area", fill = "blue") +
+  geom_vline(xintercept = 5) +
+  annotate("text", 2.5, 0.2, label = "Tie", size = 8) 
+```
+
+
+
+
+
+## Examples
+
+### 2024-2025 Serie A
+
+```{r serieA}
+serieA_raw <- read.csv("data/serieA_2024-2025.csv")
+
+serieA_teams <- with(serieA_raw, sort(unique(c(Home, Away))))
+
+serieA <- serieA_raw |>
+  mutate(
+    home_result = case_when(
+      Home_Score >  Away_Score ~ "Win",
+      Home_Score == Away_Score ~ "Tie",
+      Home_Score <  Away_Score ~ "Loss"
+    ),
+    
+    home_result = factor(home_result,
+                         levels = c("Loss", "Tie", "Win"), # order matters
+                         ordered = TRUE), # needed for ordinal regression
+    
+    Home = factor(Home, levels = serieA_teams),
+    Away = factor(Away, levels = serieA_teams)
+  )
+```
+
+When we construct the ordered factor of loss-tie-win, 
+we put it in order from loss to win.
+This results in team strengths where
+higher numbers indicate stronger teams. 
+
+Let's check records first. 
+
+```{r serieA-records}
+serieA |> 
+  pivot_longer(
+    cols = c("Home", "Away"),
+    names_to = "Location",
+    values_to = "Team"
+  ) |>
+  group_by(Team) |>
+  summarize(
+    n = n(),
+    win = sum(
+      (home_result == "Win" & Location == "Home") |
+        (home_result == "Loss" & Location == "Away")
+    ),
+    tie = sum(home_result == "Tie"),
+    loss = n - win - tie,
+    points = 3 * win + tie
+  ) |>
+  arrange(desc(points)) |>
+  datatable(filter = "top")
+```
+
+It looks like everybody has at least one win, one tie, and one loss 
+so we should be able to identify the parameters. 
+
+Since this is league where everybody plays everybody else and we have 27
+rounds of competitions, the graph is going to be very well connected. 
+
+Let's construct out model matrix.
+
+```{r serieA-model-matrix}
+construct_model_matrix <- function(d, homeCol = "home", awayCol = "away") {
+  n_games <- nrow(d)
+  n_teams <- length(unique(unlist(d[, homeCol], d[, awayCol])))
+  
+  m <- matrix(0, 
+              nrow = n_games, 
+              ncol = n_teams)
+  
+  for (g in 1:n_games) {
+    m[g, as.numeric(d[g, homeCol])] <-  1
+    m[g, as.numeric(d[g, awayCol])] <- -1
+  }
+  
+  return(m)
+}
+
+X <- construct_model_matrix(serieA, "Home", "Away")
+```
+
+Check model matrix
+
+```{r serieA-model-matrix-checks}
+dim(X) # ngames x nteams
+table(X)
+all(rowSums(X) == 0)
+all(rowSums(abs(X)) == 2)
+colSums(X)
+```
+
+Fit ordinal logistic regression model.
+
+```{r serieA-ordinal-logistic-regression-model}
+m <- polr(serieA$home_result ~ X, Hess = TRUE) # warning is expected
+summary(m)
+```
+
+Compute team strengths
+
+```{r serieA-team-strengths}
+teams <- data.frame(
+  names    = serieA_teams,
+  strength = c(coef(m), 0)
+) |>
+  mutate(
+    strength = strength - mean(strength),
+    names = factor(names, levels = names[order(strength)])
+  ) |>
+  arrange(desc(names))
+
+teams |>
+  datatable(filter = "top")
+```
+
+```{r serieA-strength-plot}
+ggplot(teams,
+       aes(
+         x = strength,
+         y = names
+       )) +
+  geom_bar(stat = "identity") +
+  labs(
+    x = 'Strength',
+    y = 'Team',
+    title = '2024-2025 Serie A',
+    subtitle = '(through round 27)'
+  )
+```
+
+To calculate probabilities we need to utilize the intercepts from the 
+model output. 
+
+```{r serieA-model-intercepts}
+m$zeta # intercept
+```
+
+These intercepts indicate the change-points when moving from a Loss to Tie to
+Win. 
+
+```{r serieA-probabilities}
+# Function to calculate probabilities
+calculate_ordinal_probabilities <- function(mean, zeta) {
+  p <- c(
+    plogis(zeta[1] - mean),
+    diff(plogis(zeta - mean)),
+    plogis(zeta[2] - mean, lower.tail = FALSE)
+  ) 
+  
+  names(p) <- c("loss", "tie", "win")
+  
+  return(p)
+}
+
+# Equal strength teams
+calculate_ordinal_probabilities(0, m$zeta)
+```
+
+We can visualize these probabilities using the logistic distribution and the
+areas under the curve. 
+
+```{r equal-strength-probabilities-visualize}
+ggplot(data.frame(x = c(-8, 8)),
+       aes(x = x)) +
+  stat_function(fun = dlogis, 
+                xlim = c(-8, m$zeta[1]), 
+                geom = "area", 
+                fill = "red") +
+  stat_function(fun = dlogis, 
+                xlim = c(m$zeta[2], 8), 
+                geom = "area", 
+                fill = "blue") +
+  stat_function(fun = dlogis) +
+  geom_vline(xintercept = m$zeta[1]) +
+  geom_vline(xintercept = m$zeta[2]) +
+  labs(
+    y = "f(x)",
+    title = "X ~ Lo(0, 1)"
+  ) +
+  annotate("text",  m$zeta[2]+5,  0.15, label = "Win",  size = 8) +
+  annotate("text",  m$zeta[1]-3,  0.15, label = "Loss", size = 8) +
+  annotate("text",  mean(m$zeta), 0.15, label = "Tie",  size = 8) 
+```
+
+```{r napoli-probabilities}
+# Napoli v Inter
+calculate_ordinal_probabilities(
+  teams$strength[teams$names == "Napoli"] -
+    teams$strength[teams$names == "Inter"], 
+  m$zeta)
+
+# Napoli v Inter
+calculate_ordinal_probabilities(
+  teams$strength[teams$names == "Napoli"] -
+    teams$strength[teams$names == "Monza"], 
+  m$zeta)
+```
+
+
