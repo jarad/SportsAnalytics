@@ -1,5 +1,13 @@
 # Announcements
 
+## 2025-03-06
+
+- Homework due tonight
+- Will Post Discussion Board Assignment
+- Will Post Homework 05
+  - Same NFL data but Win-Loss
+
+
 ## 2025-03-04
 
 - Project Ideas

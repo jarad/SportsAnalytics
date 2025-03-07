@@ -46,7 +46,7 @@ the home team wins and the home win indicator is 1, i.e. $H_g = 1$.
 
 In the implementation of the model used below,
 we will need a transformed version of this latent variable
-$M_g = M-g^\zeta - \zeta$.
+$M_g = M_g^\zeta - \zeta$.
 With this transformed version we have 
 
 $$H_ g = \mathrm{I}(M_g > -\zeta)$$
@@ -57,7 +57,7 @@ Thus,
 $$M_g \stackrel{ind}{\sim} Lo(\mu_g, 1).$$
 The mean of this distribution is our typical model using home advantage and
 team strengths. 
-$$E[M_g] = \theta_{H[g]} - \theta_{A[g]}.$$
+$$\mu_g = E[M_g] = \theta_{H[g]} - \theta_{A[g]}.$$
 We can show $\pi_g = P(M_g > -\zeta)$ and thus the latent variable representation
 is exactly the same as the typical representation we have used previously. 
 Changing $E[\mu_g]$ changes where the logistic distribution is centered on the 
