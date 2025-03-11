@@ -1,0 +1,111 @@
+---
+title: "Maximize Expected Score"
+author: "Jarad Niemi"
+date: "2025-03-10"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Goal: Maximize the expected score of a bracket. 
+
+## Tournament Structure
+
+Consider the following bracket for an 8-team, single elimination tournament. 
+
+![8-team bracket](8-team-bracket.jpg){width=50%}
+
+## Head-to-head Probabilities
+
+Suppose the following table provides the probability that the row team beats 
+the column team. 
+For example, the probability that Team A beats Team H is 0.85. 
+
+```{r probabilities, echo = FALSE, results='asis'}
+probabilities <- rbind(
+  seq(0.50, by = 0.05, length = 8),
+  seq(0.45, by = 0.05, length = 8),
+  seq(0.40, by = 0.05, length = 8),
+  seq(0.35, by = 0.05, length = 8),
+  seq(0.30, by = 0.05, length = 8),
+  seq(0.25, by = 0.05, length = 8),
+  seq(0.20, by = 0.05, length = 8),
+  seq(0.15, by = 0.05, length = 8)
+)
+
+probabilities[lower.tri(probabilities)] <- 
+  1 - t(probabilities[upper.tri(probabilities)])
+
+diag(probabilities) <- NA
+colnames(probabilities) <- 
+  rownames(probabilities) <- LETTERS[1:8]
+
+# Make non-transitive
+# probabilities[4, 5] <- 0.45
+# probabilities[5, 4] <- 1 - probabilities[4, 5]
+probabilities[1, 7] <- 0.45
+probabilities[7, 1] <- 1 - probabilities[1, 7]
+
+probabilities |>
+  xtable::xtable(
+    caption = "Probabilities for the row team to beat the column team."
+  ) |>
+  xtable::print.xtable(
+    caption.placement="top",
+    comment=FALSE)
+```
+
+## Team-Round Probabilities
+
+Use this table of probabilities and the tournament structure above to complete 
+the table below. 
+This table contains the probabilities for each team to reach the indicated
+round with the first round having a probability of 1. 
+
+```{r round-probabilities, echo=FALSE, results = 'asis'}
+round_probabilities <- data.frame(
+  Team = LETTERS[1:8],
+  `Round 2 (Semi-Finals)` = NA,
+  `Round 3 (Championship)` = NA,
+  `Round 4 (Champion)` = NA,
+  check.names = FALSE
+) |>
+  xtable::xtable(
+    caption = "Probabilities for a Team to reach a specific round.",
+    align = "c|l|c|c|c|"
+  ) |>
+  xtable::print.xtable(
+    include.rownames = FALSE,
+    hline.after = seq(-1, 8),
+    caption.placement = "top",
+    comment = FALSE
+  )
+```
+
+## Expected Score
+
+Choose any possible tournament outcome, call this your *bracket*. 
+Feel free to fill out the tournament bracket above and circle the champion. 
+
+- Calculate the probability of this bracket.
+
+Suppose a prediction competition awards 
+1 point  for each team correctly chosen to reach the semi-finals, 
+2 points for each team correctly chosen to reach the championship, and
+4 points for the  team correctly chosen as champion. 
+
+- Calculate the expected number of points this bracket will earn.
+
+Recall that an *expectation* is the value of the random variable multiplied
+by its probability. 
+Thus, the expected score can be computed by calculating the points awarded for 
+a correct team-round prediction times the probability that team-round 
+combination will occur and adding up all of these values
+
+## Questions
+
+- Are the probabilities that one team beats another team transitive? How can you tell?
+- How can we compute the bracket that will maximize the expected score?
+
