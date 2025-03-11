@@ -7,6 +7,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library("xtable")
 ```
 
 Goal: Maximize the expected score of a bracket. 
@@ -73,8 +74,8 @@ round_probabilities <- data.frame(
   check.names = FALSE
 ) |>
   xtable::xtable(
-    caption = "Probabilities for a Team to reach a specific round.",
-    align = "c|l|c|c|c|"
+    caption = "Probabilities for a team to reach a specific round.",
+    align = "c|c|c|c|c|"
   ) |>
   xtable::print.xtable(
     include.rownames = FALSE,
@@ -86,8 +87,34 @@ round_probabilities <- data.frame(
 
 ## Expected Score
 
-Choose any possible tournament outcome, call this your *bracket*. 
-Feel free to fill out the tournament bracket above and circle the champion. 
+Choose any possible tournament outcome.
+Try to choose a different bracket than everybody else. 
+
+```{r bracket, echo=FALSE, results='asis'}
+data.frame(
+  Game = c(paste0("Round 1 winner: ", 
+                  c("A,H", "D,E", "B,G", "C,F")), 
+           paste0("Semi-winner: ",
+                  c("A,H,D,E", "B,G,C,F")),
+           "Champion", "Total"),
+  Points = c(rep(1,4), rep(2,2), 4, NA),
+  Choice = "",
+  Probability = "",
+  `Expected Points` = "",
+  check.names = FALSE
+) |>
+  xtable(
+    caption = "Choose your bracket. Calculate its probability and expected points.\\\\",
+    align   = "l|l|c|c|c|c|",
+    digits  = 0
+  ) |>
+  print.xtable(
+    include.rownames = FALSE,
+    hline.after = seq(-1, 8),
+    caption.placement = "top",
+    comment = FALSE
+  )
+```
 
 - Calculate the probability of this bracket.
 
@@ -101,11 +128,14 @@ Suppose a prediction competition awards
 Recall that an *expectation* is the value of the random variable multiplied
 by its probability. 
 Thus, the expected score can be computed by calculating the points awarded for 
-a correct team-round prediction times the probability that team-round 
-combination will occur and adding up all of these values
+a correct team-round prediction times the probability that the team-round 
+combination will occur and adding up all of these values. 
 
 ## Questions
 
+- How many unique brackets are there?
 - Are the probabilities that one team beats another team transitive? How can you tell?
+- How would your score change if the scoring was different, e.g. round times seed?
 - How can we compute the bracket that will maximize the expected score?
+
 
