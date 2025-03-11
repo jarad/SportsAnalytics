@@ -1,7 +1,8 @@
 # Win-Tie-Loss Models
 
 ```{r packages}
-library("MASS") # polr: ordinal logistic regression model
+library("MASS")    # polr: ordinal logistic regression model
+library("ordinal") # clm: ordinal logistic regression model
 library("dplyr")
 library("tidyr")
 library("ggplot2"); theme_set(theme_bw())
@@ -9,7 +10,7 @@ library("DT")
 ```
 
 When sports allow ties, the statistical model used should accommodate the 
-ordinal nature of the data.
+ordinal nature of the data. Namely,
 $$ \mbox{Win} > \mbox{Tie} > \mbox{Loss} $$
 We can extend the win-loss logistic regression model to accommodate the 
 possibility of a Tie. 
@@ -26,65 +27,112 @@ game outcomes.
 
 Recall that our win-loss logistic regression model is 
 $$H_g\stackrel{ind}{\sim} Ber(\pi_g) \quad \mbox{logit}(\pi_g) 
-= \eta + \theta_{H[g]} - \theta_{A[g]}$$
+= \zeta + \theta_{H[g]} - \theta_{A[g]}$$
 where 
 
 - $H_g$ is an indicator that the home team won game $g$ (0 if home team lost, 1 if home team won),
-- $\eta$ is the home advantage, and
+- $\zeta$ is the home advantage, and
 - $\theta_t$ is the strength of team $t$.
 
 An equivalent way to express this model introduces a 
-*latent variable* $Z_g$ with a logistic distribution.
+*latent variable* $M_g^\zeta$ with a logistic distribution.
 Given this latent variable, the outcome is deterministic. 
 Namely,
-$$H_g = \mathrm{I}(Z_g > 0) = \mathrm{I}(Z_g-\eta > -\eta).$$
+$$H_g = \mathrm{I}(M_g^\zeta > 0)$$ 
+Latent variables often have a real-world interpretation. 
+In this case, $M_g^\zeta$ is related to the margin of victory. 
+If the margin of victory is greater than 0,
+the home team wins and the home win indicator is 1, i.e. $H_g = 1$. 
 
-Then we assume $Z_g$ has a logistic distribution whose scale parameter,
-for identifiability, is set to a constant. 
-$$Z_g \stackrel{ind}{\sim} Lo(\mu_g, 1).$$
+In the implementation of the model used below,
+we will need a transformed version of this latent variable
+$M_g = M_g^\zeta - \zeta$.
+With this transformed version we have 
+
+$$H_ g = \mathrm{I}(M_g > -\zeta)$$
+For logistic regression, $M_g$ has a logistic distribution. 
+For identifiability reasons, this distribution has a fixed scale parameter
+and, by convention, is often set to 1.
+Thus, 
+$$M_g \stackrel{ind}{\sim} Lo(\mu_g, 1).$$
 The mean of this distribution is our typical model using home advantage and
 team strengths. 
-$$\mu_g = \eta + \theta_{H[g]} - \theta_{A[g]}.$$
-We can show $\pi_g = P(Z_g > 0)$ and thus these two representations of 
-the logistic distribution are equivalent. 
-Changing $\mu_g$ changes where the logistic distribution is centered on the 
-number line and therefore the $P(Z_g > 0)$.
+$$\mu_g = E[M_g] = \theta_{H[g]} - \theta_{A[g]}.$$
+We can show $\pi_g = P(M_g > -\zeta)$ and thus the latent variable representation
+is exactly the same as the typical representation we have used previously. 
+Changing $E[\mu_g]$ changes where the logistic distribution is centered on the 
+number line and therefore the $P(M_g > -\zeta)$.
 
 ```{r logistic-win-loss}
+h <- 0.15 # height of labels
+
 g <- ggplot(data.frame(x = c(-6, 10)),
        aes(x = x)) +
-  stat_function(fun = dlogis, args = list(location = 1), 
-                xlim = c(-6, 0), geom = "area", fill = "red") +
-  stat_function(fun = dlogis, args = list(location = 1)) +
-  geom_vline(xintercept = 1, color = "gray", linetype = "dashed") +
-  geom_vline(xintercept = 0) +
+  stat_function(fun = dlogis, 
+                xlim = c(-6, -1), geom = "area", fill = "red") +
+  stat_function(fun = dlogis) +
+  geom_vline(xintercept = -1) +
   labs(
-    y = "f(x)",
-    title = "X ~ Lo(1, 1)",
-    subtitle = "P(Win) = P(X > 0)"
+    x = "m",
+    y = "f(m)",
+    title = "M ~ Lo(0, 1)",
+    subtitle = "P(Loss) = P(M < -1)"
   ) +
-  annotate("text",  8, 0.2, label = "Win",  size = 8) +
-  annotate("text", -3, 0.2, label = "Loss", size = 8) 
+  annotate("label",  6, h, label = "Win",  size = 8) +
+  annotate("label", -4, h, label = "Loss", size = 8) 
 
 g
 ```
 
+In this figure, 
+we can see that the estimated home advantage can be alternatively interpreted
+as the threshold (or cutpoint) for change from a loss to a win. 
+Values for $M_g$ below the threshold result in a loss while values above the
+threshold result in a win. 
+
 ### Ordinal Logistic Regression
 
 To account for ties in addition to wins and losses, 
-we can include a cutpoint in addition to 0. 
+we can include an additional threshold to separate ties from wins.  
 Modifying the above picture it may look something like this. 
 
 ```{r logistic-win-tie-loss}
+tw <- 3 # tie-win threshold
+
 g +
-  stat_function(fun = dlogis, args = list(location = 1), 
-                xlim = c(0, 5), geom = "area", fill = "blue") +
-  geom_vline(xintercept = 5) +
-  annotate("text", 2.5, 0.2, label = "Tie", size = 8) 
+  stat_function(fun = dlogis, 
+                xlim = c(tw, 10), geom = "area", fill = "blue") +
+  geom_vline(xintercept = tw) +
+  annotate("label", mean(c(-1, tw)), h, label = "Tie", size = 8) +
+  labs(
+    subtitle = "P(Loss) = P(M < -1), P(Win) = P(M > 3)"
+  )
 ```
 
+So we ordinal logistic regression model has a similar latent variable 
+$$M_g \stackrel{ind}{\sim} Lo(\theta_{H[g]} - \theta_{A[g]}, 1)$$
+and two thresholds
+$$\mbox{R}_g = \left\{ \begin{array}{ll}
+Loss & M_g < \zeta_1 \\
+Tie  & \zeta_1 < M_g < \zeta_2 \\
+Win  & \zeta_2 < M_g
+\end{array} \right.$$
+$R_g$ is an ordinal categorical variable that indicates the result of the 
+game (loss, tie, or win) from the home team's perspective.
+The parameters in this model are 
 
+- $\theta_t$: strength of team $t$,
+- $\zeta_1$: threshold separating loss from tie, and
+- $\zeta_2$: threshold separating tie from win.
 
+The thresholds are common to all games and teams. 
+The thresholds are related to home advantage since, 
+as the values of these thresholds get more negative,
+the probability the home team wins increases. 
+
+To calculate loss, tie, and win probabilities, we calculate the probability
+that the latent variable $M_g$ falls within the three intervals: 
+$(-\infty, \zeta_1)$, $(\zeta_1, \zeta_2)$, and $(\zeta_2,\infty)$, respectively.
 
 
 ## Examples
@@ -204,6 +252,8 @@ teams |>
   datatable(filter = "top")
 ```
 
+Plot team strengths
+
 ```{r serieA-strength-plot}
 ggplot(teams,
        aes(
@@ -223,7 +273,7 @@ To calculate probabilities we need to utilize the intercepts from the
 model output. 
 
 ```{r serieA-model-intercepts}
-m$zeta # intercept
+m$zeta # thresholds
 ```
 
 These intercepts indicate the change-points when moving from a Loss to Tie to
@@ -287,4 +337,27 @@ calculate_ordinal_probabilities(
   m$zeta)
 ```
 
+## R packages
 
+In this analysis, we utilized the `polr()` function from the 
+[MASS package](https://cran.r-project.org/web/packages/MASS/index.html) 
+since this package is installed by default when you install R.
+
+The [ordinal](https://cran.r-project.org/web/packages/ordinal/index.html)
+can also implement the ordinal logistic regression model using the `clm()` 
+function. 
+
+```{r r-package-ordinal}
+mo <- ordinal::clm(serieA$home_result ~ X)
+summary(mo)
+```
+
+An appealing aspect of this package is the ability to fixed mixed effect 
+ordinal regression models using the `clmm()` function. 
+
+## Summary
+
+The development here used the logistic distribution due to its relationship
+with logistic regression.
+An alternatively commonly used approach uses the normal distribution due to 
+its relationship with probit regression. 
