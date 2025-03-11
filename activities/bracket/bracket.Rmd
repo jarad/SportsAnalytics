@@ -1,8 +1,7 @@
 ---
-title: "Maximize Expected Score"
-author: "Jarad Niemi"
-date: "2025-03-10"
-output: pdf_document
+output:
+  pdf_document:
+classoption: 11pt
 ---
 
 ```{r setup, include=FALSE}
@@ -58,6 +57,11 @@ probabilities |>
     comment=FALSE)
 ```
 
+Question:
+
+- Are the probabilities that one team beats another team transitive? How can you tell?
+
+\newpage
 ## Team-Round Probabilities
 
 Use this table of probabilities and the tournament structure above to complete 
@@ -131,11 +135,10 @@ Thus, the expected score can be computed by calculating the points awarded for
 a correct team-round prediction times the probability that the team-round 
 combination will occur and adding up all of these values. 
 
-## Questions
+Questions:
 
 - How many unique brackets are there?
-- Are the probabilities that one team beats another team transitive? How can you tell?
 - How would your score change if the scoring was different, e.g. round times seed?
-- How can we compute the bracket that will maximize the expected score?
+- How can we compute the bracket that will maximize the expected score especially if the scoring is complicated?
 
 
