@@ -1,5 +1,14 @@
 # Announcements
 
+## 2025-03-11
+
+- HW05 due Thursday
+  - Suggest using HW04 code to start (model matrix is the same for part 1)
+  - Unlimited attempts, you are shown which answers are correct or incorrect
+- Discuss Board Post for Player Contribution data will be for after break
+- ISU v KSU Competition
+
+
 ## 2025-03-06
 
 - Homework due tonight
