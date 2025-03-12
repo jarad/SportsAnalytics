@@ -1,7 +1,9 @@
 ---
+header-includes:
+  - \usepackage{fullpage}
+  - \pagenumbering{gobble}
 output:
   pdf_document:
-classoption: 11pt
 ---
 
 ```{r setup, include=FALSE}
@@ -17,6 +19,10 @@ Consider the following bracket for an 8-team, single elimination tournament.
 
 ![8-team bracket](8-team-bracket.jpg){width=50%}
 
+Questions:
+
+- How many unique brackets are there?
+
 ## Head-to-head Probabilities
 
 Suppose the following table provides the probability that the row team beats 
@@ -24,7 +30,7 @@ the column team.
 For example, the probability that Team A beats Team H is 0.85. 
 
 ```{r probabilities, echo = FALSE, results='asis'}
-probabilities <- rbind(
+p <- rbind(
   seq(0.50, by = 0.05, length = 8),
   seq(0.45, by = 0.05, length = 8),
   seq(0.40, by = 0.05, length = 8),
@@ -35,20 +41,24 @@ probabilities <- rbind(
   seq(0.15, by = 0.05, length = 8)
 )
 
-probabilities[lower.tri(probabilities)] <- 
-  1 - t(probabilities[upper.tri(probabilities)])
-
-diag(probabilities) <- NA
-colnames(probabilities) <- 
-  rownames(probabilities) <- LETTERS[1:8]
-
 # Make non-transitive
-# probabilities[4, 5] <- 0.45
-# probabilities[5, 4] <- 1 - probabilities[4, 5]
-probabilities[1, 7] <- 0.45
-probabilities[7, 1] <- 1 - probabilities[1, 7]
+p[1, 7] <- 0.45
 
-probabilities |>
+# Ensure probabilities sum to 1
+for (r in 2:nrow(p)) {
+  for (c in 1:r) {
+    p[c, r] <- 1 - p[r, c]
+  }
+}
+
+
+
+diag(p) <- NA
+colnames(p) <- 
+  rownames(p) <- LETTERS[1:8]
+
+
+p |>
   xtable::xtable(
     caption = "Probabilities for the row team to beat the column team."
   ) |>
@@ -69,6 +79,7 @@ the table below.
 This table contains the probabilities for each team to reach the indicated
 round with the first round having a probability of 1. 
 
+\large
 ```{r round-probabilities, echo=FALSE, results = 'asis'}
 round_probabilities <- data.frame(
   Team = LETTERS[1:8],
@@ -88,12 +99,19 @@ round_probabilities <- data.frame(
     comment = FALSE
   )
 ```
+\normalsize
+
+Questions:
+
+- How can we check these probabilities?
 
 ## Expected Score
 
-Choose any possible tournament outcome.
-Try to choose a different bracket than everybody else. 
+Choose any possible tournament outcome and call this your bracket.
+Your goal is to pick the bracket with the highest expected score that nobody
+else picks. 
 
+\large
 ```{r bracket, echo=FALSE, results='asis'}
 data.frame(
   Game = c(paste0("Round 1 winner: ", 
@@ -119,26 +137,25 @@ data.frame(
     comment = FALSE
   )
 ```
+\normalsize
 
-- Calculate the probability of this bracket.
+**Calculate the probability of this bracket** 
+by multiplying all the independent probabilities.
 
 Suppose a prediction competition awards 
 1 point  for each team correctly chosen to reach the semi-finals, 
 2 points for each team correctly chosen to reach the championship, and
 4 points for the  team correctly chosen as champion. 
-
-- Calculate the expected number of points this bracket will earn.
-
+**Calculate the expected number of points your bracket** will earn.
 Recall that an *expectation* is the value of the random variable multiplied
 by its probability. 
-Thus, the expected score can be computed by calculating the points awarded for 
+Thus, the expected score can be computed by multiplying the points awarded for 
 a correct team-round prediction times the probability that the team-round 
 combination will occur and adding up all of these values. 
 
 Questions:
 
-- How many unique brackets are there?
-- How would your score change if the scoring was different, e.g. round times seed?
-- How can we compute the bracket that will maximize the expected score especially if the scoring is complicated?
+- How would your expected score change if the scoring was different, e.g. round times seed?
+- How can we find the bracket that will maximize the expected score especially if the scoring is complicated?
 
 
