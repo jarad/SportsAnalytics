@@ -1,5 +1,13 @@
 # Announcements
 
+## 2025-03-13
+
+- HW05 due TODAY
+  - Office hours: 12:30 - 3 @ 1109 Snedecor
+- New Project "Homework"
+  - Due Thursday after break
+- ISU v KSU Competition
+
 ## 2025-03-11
 
 - HW05 due Thursday
