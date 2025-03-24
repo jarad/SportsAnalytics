@@ -19,8 +19,11 @@ book:
       - 06-margin-of-victory.qmd
       - 07-win-loss.qmd
       - win-tie-loss.qmd
-      - offense-defense-rating.qmd
+      - chapters/head-to-head/offense-defense-rating.qmd
       - 08-player-contribution.qmd
+    - part: chapters/bracketology/bracketology.qmd
+      chapters:
+      - chapters/bracketology/expected-score.qmd
     - summary.qmd
     - references.qmd
     - 99-data.qmd

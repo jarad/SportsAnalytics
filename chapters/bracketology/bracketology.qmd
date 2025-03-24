@@ -1,0 +1,33 @@
+# Bracketology {.unnumbered}
+
+This part looks into statistical aspects of tournament brackets where one team
+(or individual) competes against another team (or individual) at a time.
+Tournaments are typically either single or double elimination. 
+
+## Single elimination
+
+In a single elimination tournament, the winning team moves on while the losing 
+team is eliminated from the tournament. 
+
+![](8-team-single-elimination-bracket.png)
+
+
+## Double elimination
+
+In a double elimination tournament, when a team loses the first time, the
+move on in the "losers" brackets.
+The championship is between the winner of the winners bracket,
+i.e. the team that has never lost, and the winner of the losers bracket. 
+
+
+![](8-team-single-elimination-bracket.png)
+
+
+## Examples
+
+- Tennis tournaments
+- World Cup Soccer tournaments
+- FRC Robotics Tournaments
+
+
+

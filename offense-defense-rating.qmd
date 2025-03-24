@@ -1,4 +1,0 @@
-# Offense-Defense Rating
-
-This is a stub for models that estimate team/player offense and defense strength
-rather than just an overall strength rating. 

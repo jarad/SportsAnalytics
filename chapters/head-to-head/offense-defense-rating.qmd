@@ -1,0 +1,811 @@
+# Offense-Defense Rating
+
+```{r packages}
+library("tidyverse"); theme_set(theme_bw())
+```
+
+A simple example of offense-defense data is this fictitious collection of 4 
+teams that have played 5 games. 
+
+
+```{r data}
+d <- tribble(
+  ~home, ~away, ~home_score, ~away_score, 
+      1,     2,          21,           7,
+      2,     3,          13,          14,
+      4,     1,           3,          28,
+      3,     4,          31,           0,
+      1,     3,          42,          10
+) 
+```
+
+Previously, calculated the margin of victory (home score minus away score)
+and constructed a model for the margin of victory. 
+In those models, we estimated a team strength and used the different in team
+strengths to calculate the expected margin of victory and game outcome
+probabilities. 
+
+In this chapter, we will build models for the both the home score and the 
+away score. 
+Using these scores allows us to estimate offense and defense team strengths. 
+
+
+
+## Model
+
+A model for the number of points scored by the home team is 
+
+$$S^H_g = \eta_O + \theta_{H[g]} - \delta_{A[g]} + \epsilon^H_g$$
+
+where, for game $g$,
+
+- $S^H_g$ is the score for the home team,
+- $H[g]$ is the ID for the home team, 
+- $A[g]$ is the ID for the away team,
+- $\epsilon^H_g$ is a random error.
+
+This error arises because if two teams play each other repeatedly we would 
+expect the home score would be random around the expected
+home score.
+
+The parameters are 
+
+- $\eta_O$ is the offensive home field advantage, 
+- $\theta_t$ is the offensive strength of team $t$, and
+- $\delta_t$ is the defense strength of team $t$.
+
+The expected home score when team $H$ is at home playing against team $A$ is 
+
+$$E\left[S^H\right] = \eta + \theta_{H} - \delta_{A}.$$
+We can build a similar model for the away team score. 
+A model for the number of points scored by the away team is 
+
+$$S^A_g = \eta_D + \theta_{A[g]} - \delta_{H[g]} + \epsilon^A_g$$
+
+where, for game $g$,
+
+- $S^A_g$ is the score for the away team,
+- $\epsilon^A_g$ is a random error.
+
+This error arises because if two teams play each other repeatedly we would 
+expect the away score would be random around the expected
+away score.
+
+The parameters are 
+
+- $\eta_D$ is the defensive home field advantage.
+
+The expected away score when team $H$ is at home playing against team $A$ is 
+
+$$E\left[S^A\right] = \eta + \theta_{A} - \delta_{H}.$$
+
+We can utilize these models to calculate the expected margin of victory $M$ for 
+home team $H$ playing away team $A$:
+$$E[M] 
+= E[S^H - S^A] 
+= E[S^H] - E[S^A] 
+= \eta_O + \theta_H - \delta_A - (\eta_D + \theta_A - \delta_H)
+= (\eta_O - \eta_D) + (\theta_H + \delta_H) - (\theta_A + \delta_A)
+$$
+where 
+
+- $\eta_O - \eta_D$ is the home advantage,
+- $\theta_H - \delta_H$ is the strength of the home team, and
+- $\theta_A - \delta_A$ is the strength of the away team.
+
+
+
+### Identifiability
+
+In this model, 
+when two teams play each other, the score is expected to be the 
+home field advantage $\eta$ plus the difference in strengths between the two
+teams $\theta - \delta$.
+Thus, only the difference between the offense and defense rating is identifiable.
+
+
+
+
+### Regression
+
+
+If we assume $\epsilon_i \stackrel{ind}{\sim} N(0,\sigma^2)$,
+then this is a linear regression model. 
+
+Since we have both the offensive parameters ($\theta$s) and defensive 
+parameters ($\delta$s), 
+we will need to construct a home matrix $X^H$ and an away matrix $X^A$. 
+For $X^H$ we have 
+$$X^H_{g,t} = \left\{
+\begin{array}{rl}
+1 & \mbox{if team $t$ is the home team in game $g$} \\
+0 & \mbox{otherwise}
+\end{array} \right.$$
+
+
+For the analysis that follows, 
+we will construct a model matrix $X$ where 
+$X_{g,t} = 1$ if team $t$ is the home team in game $g$,  
+$X_{g,t} = -1$ if team $t$ is the away team in game $g$,
+$X_{g,t} = 0$ otherwise.
+
+```{r model-matrix}
+construct_matrix <- function(d, Col = "home") {
+  n_games <- nrow(d)
+  n_teams <- length(unique(unlist(d[, Col])))
+  
+  m <- matrix(0, 
+              nrow = n_games, 
+              ncol = n_teams)
+  
+  for (g in 1:n_games) {
+    m[g, as.numeric(d[g, Col])] <-  1
+  }
+  
+  return(m)
+}
+
+X_h <- construct_matrix(d, "home")
+X_a <- construct_matrix(d, "away")
+```
+
+Check to make sure these matrices are appropriate
+
+```{r check-matrices}
+# n_games x n_teams
+dim(X_h) 
+dim(X_a) 
+
+# all entries are 0 or 1
+all(unique(X_h) %in% 0:1) 
+all(unique(X_a) %in% 0:1)
+
+all(rowSums(X_h) == 1)
+all(rowSums(X_a) == 1)
+```
+
+
+
+To see how it is a linear regression model, 
+we can construct a regression model using matrix algebra
+$$
+Y = \left[ \begin{array}{c} 
+S^H_1 \\ \vdots \\ S^H_G \\
+S^A_1 \\ \vdots \\ S^A_G 
+\end{array} \right] 
+= \left[ \begin{array}{cc} 
+1 & X_h & 0 & -X_a \\ 0 & X_a & 1 & -X_h
+\end{array} \right] 
+\left[ \begin{array}{c} 
+\eta^O \\ \theta_1 \\ \vdots \\ \theta_T \\
+\eta^D \\ \delta_1 \\ \vdots \\ \delta_T 
+\end{array} \right] + \epsilon 
+= X\beta + \epsilon
+$$
+where $1$ ($0$) is shorthand for a $G \times 1$ vector of all 1s (0s). 
+
+
+
+Thus, we can estimate the parameters in this model using linear regression.
+
+```{r regression}
+Y <- c(d$home_score, d$away_score)
+X <- rbind(
+  cbind (1, X_h, -X_a),
+  cbind(-1, X_a, -X_h)
+)
+m <- lm(Y ~ 0 + X) # 0 removes intercept (so does -1) 
+
+home_advantage <- coef(m)[1]
+
+teams <- data.frame(
+  team = 1:4,
+  offense = coef(m)[2:5],
+  defense = coef(m)[6:9]
+) |>
+  mutate(
+    offense = offense - mean(offense),
+    
+    defense = ifelse(is.na(defense), 0, defense),
+    defense = defense - mean(defense),
+    
+    strength = offense + defense
+  )
+```
+
+Fit two models
+
+```{r}
+```
+
+
+```{r regression-summary}
+summary(m)
+```
+
+
+
+From this model, we can obtain individual values for $\theta$.
+The estimated values are 
+
+```{r regression-estimates}
+coef(m)
+```
+
+With these data, the estimated home field advantage is 
+$\eta = `r coef(m)[1]`.
+The estimated ability for the teams are 
+```{r coef-no-intercept}
+coef(m)[-1]
+```
+
+The fourth team has an estimated value of $\theta_4 = `r coef(m)[5]`$,
+i.e. not available. 
+The reason for this is the identifiability issue above. 
+
+Here, the $`r coef(m)[5]`$ can be replaced by 0. 
+
+```{r team-ability}
+team_ability <- coef(m)[-1]
+team_ability[4] <- 0
+team_ability
+```
+
+Using these team ability estimates, we can compute the expected point 
+difference between the teams. 
+For example, on a neutral court, the expected point difference between team
+1 and team 2 is
+```{r expected-point-difference-1-v-2}
+team_ability[1] - team_ability[2] # expected point difference on a neutral court
+```
+So Team 1 is expected to beat Team 2 by 
+`r round(team_ability[1] - team_ability[2])`
+points. 
+
+
+### Prediction
+
+In addition to the expected point difference,
+you can use this model to predict the probability that one team beats the 
+other team. 
+In order to perform this prediction, we need to know the variability around
+the expected point spread. 
+We can extract this information from the regression model.
+The estimated residual standard deviation is 
+```{r residual-sd}
+summary(m)$sigma
+```
+
+Prediction in a regression model utilizes a $t$ distribution with degrees
+of freedom equal to the number of observations minus the number of teams. 
+This is given in the R output.
+```{r df}
+summary(m)$df[2] 
+```
+Thus to calculate the probability that Team 1 beats Team 2 on a neutral court
+we calculate
+$$P\left(T_v < \frac{\theta_1 - \theta_2}{\hat\sigma}\right).$$
+In R code, we have 
+
+```{r probability-neutral}
+pt( (team_ability[1] - team_ability[2]) / summary(m)$sigma, summary(m)$df[2] )
+```
+
+
+### Transitivity
+
+One drawback of these types of models is that the model is transitive, 
+but this may not reflect reality. 
+The transitivity property in this model is 
+$$\theta_A > \theta_B \quad\&\quad \theta_B > \theta_C \,\implies\, \theta_A > \theta_C.$$
+In words, this means that if Team A is better than Team B and 
+Team B is better than Team C, 
+then Team A must be better than Team C. 
+This precludes the possibility that Team C could match up well against Team A. 
+
+As an example, consider the following set of teams and games.
+```{r non-transitive-data}
+d2 <- tribble(
+  ~home, ~away, ~margin, 
+      1,     2,     100,   
+      2,     3,      90, 
+      3,     1,      95,
+  
+      2,     1,    -100,   
+      3,     2,     -90, 
+      1,     3,     -95
+) 
+```
+
+If these were data for basketball games, 
+we would expect that 
+Team 1 has a high probability of beating Team 2,
+Team 2 has a high probability of beating Team 3, and
+Team 3 has a high probability of beating Team 1. 
+
+Fitting the model above and estimating the probstrengths tells a different
+story.
+
+```{r non-transitive-modeling}
+X2 <- construct_model_matrix(d2)
+
+m2 <- lm(d2$margin ~ X2)
+summary(m2)
+```
+
+We can already see issues here since none of the coefficients are 
+significantly different from zero. 
+
+```{r non-transitive-probstrengths}
+# Calculate team strengths
+team_ability <- coef(m2)[-1]
+team_ability[3] <- 0
+team_ability
+
+# Calculate probstrengths
+pt( (team_ability[1] - team_ability[2]) / summary(m2)$sigma, summary(m2)$df[2])
+pt( (team_ability[1] - team_ability[3]) / summary(m2)$sigma, summary(m2)$df[2])
+pt( (team_ability[2] - team_ability[3]) / summary(m2)$sigma, summary(m2)$df[2])
+```
+
+
+
+### Estimability
+
+Consider this set of teams and games
+
+```{r disconnected-data}
+d3 <- tribble(
+  ~home, ~away, ~margin, 
+      1,     2,      10,   
+      3,     4,       9
+) 
+```
+
+From these data, we cannot determine how good teams 1-2 and compared to teams
+3-4. Even if with a lot more data we may not be able to estimate the model
+parameters.
+
+```{r disconnected-data2}
+d4 <- tribble(
+  ~home, ~away, ~margin, 
+      1,     2,      10,   
+      3,     4,       9, 
+      1,     2,       5,   
+      3,     4,      13, 
+      1,     2,       1,   
+      3,     4,      -3, 
+      1,     2,       2,   
+      3,     4,      -6 
+) 
+```
+
+If we try to actually fit this model, 
+
+```{r disconnected-data2-model}
+X4 <- construct_model_matrix(d4)
+m4 <- lm(d4$margin ~ X4)
+summary(m4)
+```
+
+While previously we had only 1 line with NAs, 
+we now have 3 lines with NAs. 
+
+::: {.callout-note}
+## Estimability
+Parameters are said to be *estimable* with a certain said of data if
+the parameters can be estimated with that data. 
+Thus parameters may be *identifiable* but not estimable while
+parameters that are not identifiable are never estimable. 
+:::
+
+#### Graphs
+
+In these models, the graph of team contests is helpful. 
+
+```{r graph}
+library("igraph")
+
+plot(graph_from_data_frame(d3[,c(2,1)]))          # arrows point away -> home
+plot(graph_from_data_frame(d3, directed = FALSE))
+plot(graph_from_data_frame(d4, directed = FALSE))
+```
+
+Parameters (or functions of parameters) may also be weakly estimable. 
+Consider these data
+
+```{r}
+d_conf <- tribble(
+  ~home, ~away, ~margin, 
+      1,     2,      10, # Conference 1  
+      3,     4,       9, 
+      2,     3,      -2,
+      1,     4,     -20,
+      3,     1,       4,
+      4,     2,      16,
+      5,     6,      10, # Conference 2
+      7,     8,       9, 
+      6,     7,      -2,
+      5,     8,     -20,
+      7,     5,       4,
+      8,     6,      16,
+      1,     5,      10 # Inter-conference Game
+) 
+```
+
+```{r}
+plot(graph_from_data_frame(d_conf[, c(2,1)]))
+```
+
+Predict the outcome for two teams 
+
+```{r}
+# Predict the outcome for 3 vs 7
+Xconf <- construct_model_matrix(d_conf)
+m <- lm(d_conf$margin ~ Xconf)
+summary(m)
+
+# Expected point difference (neutral court)
+(exp_diff <- coef(m)[4] - coef(m)[8])
+
+# Probability of winning (neutral court)
+pt( exp_diff / summary(m)$sigma, df = summary(m)$df[2])
+```
+
+Now let's change the result for the intraconference game and see what happens.
+
+```{r}
+d_conf2 <- d_conf
+d_conf2$margin[nrow(d_conf2)]        # old score
+d_conf2$margin[nrow(d_conf2)] <- -10 # new score
+
+# Predict the outcome for 3 vs 7
+Xconf2 <- construct_model_matrix(d_conf2)
+m2 <- lm(d_conf2$margin ~ Xconf2)
+summary(m2)
+
+# Expected point difference (neutral court)
+(exp_diff2 <- coef(m2)[4] - coef(m2)[8])
+
+# Probability of winning (neutral court)
+pt( exp_diff2 / summary(m2)$sigma, df = summary(m2)$df[2])
+```
+
+Inter-conference play determines amount of ``strength'' allocated to the
+conference. 
+
+```{r}
+plot(coef(m)[-1], coef(m2)[-1])
+```
+
+
+
+
+
+
+
+
+## Rating Systems
+
+### Sagarin Ratings
+
+An example of publish margin of victory model estimates are
+[Sagarin Ratings](http://sagarin.com/sports/cbsend.htm).
+There is an 
+[R package that may be able to scrape Sagarin ratings](https://github.com/jarad/sagarin).
+Argh, these have stopped being updated in 2023.
+
+### Ken Pomeroy
+
+I believe 
+[Ken Pomeroy's ratings](https://kenpom.com/index.php) are based on 
+these margin-of-victory models. 
+
+
+
+
+## Examples
+
+### Iowa High School Football
+
+
+### International Handball
+
+```{r handball-data}
+handball2024 <- read_csv("data/Handball_W_InternationalResults.csv",
+                     col_types = cols(
+                       ScoreA = col_double(),
+                       ScoreB = col_double(),
+                       year = col_integer(),
+                       Date = col_date(),
+                       .default = col_character()
+                     )) |>
+  filter(year == 2024) |>
+  mutate(
+    margin = ScoreA - ScoreB
+  )
+```
+
+```{r handball-graph}
+
+# plot(graph_from_data_frame(handball[,c("TeamA","TeamB")]), directed = FALSE)
+
+library("networkD3")
+
+p <- simpleNetwork(handball2024, 
+                   height="100px", width="100px",        
+        Source = "TeamA",                 # column number of source
+        Target = "TeamB",                 # column number of target
+        linkDistance = 10,          # distance between node. Increase this value to have more space between nodes
+        charge = -900,                # numeric value indicating either the strength of the node repulsion (negative value) or attraction (positive value)
+        fontSize = 14,               # size of the node names
+        fontFamily = "serif",       # font og node names
+        linkColour = "#666",        # colour of edges, MUST be a common colour for the whole graph
+        nodeColour = "#69b3a2",     # colour of nodes, MUST be a common colour for the whole graph
+        opacity = 0.9,              # opacity of nodes. 0=transparent. 1=no transparency
+        zoom = T                    # Can you zoom on the figure?
+        )
+
+p
+```
+
+```{r handball-filter}
+separated_countries <- c("Romania", "Bosnia and Herzegovina", "Greece", "Croatia")
+
+handball2024b <- handball2024 |>
+  filter(!( TeamA %in% separated_countries | TeamB %in% separated_countries) )
+```
+
+
+```{r handball-model}
+# Convert team names into factors
+teams <- data.frame(
+  names = c(handball2024b$TeamA, handball2024b$TeamB) |>
+    unique() |>
+    sort() |>
+    factor()
+) 
+
+X_h <- handball2024b |>
+  rename(
+    home = TeamA,
+    away = TeamB
+  ) |>
+  mutate(
+    home = factor(home, levels = teams$names),
+    away = factor(away, levels = teams$names)
+  ) |>
+  construct_model_matrix()
+
+dim(X_h) # n_games x n_teams
+
+m <- lm(handball2024b$margin ~ X_h - 1) # remove the home field advantage
+summary(m)$sigma
+```
+
+```{r handball-strength}
+teams$strength <- coef(m)
+teams$strength[nrow(teams)] <- 0
+teams$strength <- teams$strength - mean(teams$strength)
+
+teams$names <- factor(teams$names, levels = teams$names[order(teams$strength)])
+
+ggplot(teams, 
+       aes(
+         x = strength,
+         y = names
+       )) +
+  geom_bar(stat = "identity")
+```
+
+The distribution of scores around the expected score.
+
+```{r handball-residuals}
+ggplot() +
+  geom_histogram(
+    aes(
+      x = m$residuals,
+        y = after_stat(density)
+    ), # Get frequency rather than count
+    binwidth = 1,
+  ) +
+  stat_function(
+    fun  = dnorm, 
+    args = list(
+      mean = mean(m$residuals),
+      sd   = sd(m$residuals)
+    ), 
+    color = "red"
+  ) +
+  labs(
+    x = 'Actual Score - Expected Score',
+    y = 'Density',
+    title = 'Handball Score Variability'
+  )
+```
+
+I was expecting these residuals to be centered at 0,
+but I fit a model that did not include an intercept
+(since there was no clear home field). 
+Perhaps an intercept was needed?
+
+```{r handball-intercept}
+# Refit model with intercept
+m <- lm(handball2024b$margin ~ X_h) 
+summary(m)$coefficients[1,]
+```
+
+It appears the intercept is significant. 
+Taking a look at the data, there appears to be a Venue listed and this Venue
+would provide information about a possible home-field advantage.
+The analysis here would likely need to be a bit more complex as the home-field
+advantage should only be listed when a team is actually playing at home. 
+
+```{r handball-venue}
+handball2024b |> 
+  select(TeamA, TeamB, Venue) |> 
+  as.data.frame()
+```
+
+### College Baseball 2024
+
+```{r baseball-data-tmp}
+baseball <- read.csv("data/college_baseball_2024.csv")
+```
+
+Let's take a look at these data. 
+(Really I got quite a way in the analysis and realized an issue, 
+so now I'm back fixing up the data.)
+
+```{r baseball-data-exploratory}
+str(baseball)
+
+sort(unique(c(baseball$Team_1, baseball$Team_2)))
+sort(unique(baseball$Home_Field)) # there are neutral sites
+
+# Compared to sports we have been looking at baseball scores are relatively low
+# with most scores 10 or below
+table(c(baseball$Score_1, baseball$Score_2))
+```
+
+Let's deal explicitly with neutral sites. 
+
+
+
+
+```{r baseball-data}
+baseball2024 <- baseball |>
+  
+  # Create home/away teams and scores
+  # for neutral sites, home/away will be arbitrary
+  mutate(
+    Home_Field = gsub("@", "", Home_Field),
+    home_is_Team_1 =                        # this is used repeatedly below
+      Home_Field == "neutral" | 
+        Home_Field == Team_1,  
+    
+    # Set the teams
+    home = ifelse(home_is_Team_1, Team_1, Team_2),
+    away = ifelse(home_is_Team_1, Team_2, Team_1),
+    
+    # Set the scores
+    home_score = ifelse(home_is_Team_1, Score_1, Score_2),
+    away_score = ifelse(home_is_Team_1, Score_2, Score_1),
+    
+    margin = home_score - away_score,
+    
+    Date = as.Date(Dates, format = "%m/%d/%Y")
+  ) |>
+  select(Date, Home_Field, home, away, home_score, away_score, margin)
+```
+
+Let's first check the graph connectedness. 
+
+```{r baseball-graph}
+p <- simpleNetwork(baseball2024, 
+                   height="100px", width="100px",        
+        Source = "away",                 # column number of source
+        Target = "home",                 # column number of target
+        linkDistance = 10,          # distance between node. Increase this value to have more space between nodes
+        charge = -900,                # numeric value indicating either the strength of the node repulsion (negative value) or attraction (positive value)
+        fontSize = 14,               # size of the node names
+        fontFamily = "serif",       # font og node names
+        linkColour = "#666",        # colour of edges, MUST be a common colour for the whole graph
+        nodeColour = "#69b3a2",     # colour of nodes, MUST be a common colour for the whole graph
+        opacity = 0.9,              # opacity of nodes. 0=transparent. 1=no transparency
+        zoom = T                    # Can you zoom on the figure?
+        )
+
+p
+```
+
+
+
+
+Let's build our model for margin of victory depending on team strength and
+include home-field advantage when it is relevant. 
+
+
+To do so, we will create an additional column in the X matrix that includes a
+home-field advantage only when playing on a home-field,
+i.e. not at a *neutral* site.
+Then, when we run the regression, we will not include an intercept. 
+
+
+```{r baseball-construct-model-matrix}
+# Construct factors for teams
+teams <- data.frame(
+  names = c(baseball2024$home, baseball2024$away) |>
+    unique() |>
+    sort() |>
+    factor()
+)
+
+baseball2024 <- baseball2024 |>
+  mutate(
+    home = factor(home, levels = teams$names),
+    away = factor(away, levels = teams$names)
+  )
+
+X_baseball <- 
+  cbind(
+    1 * !(baseball2024$Home_Field == "neutral"),
+    construct_model_matrix(baseball2024)
+  )
+
+colnames(X_baseball) <- c("home-field advantage", as.character(teams$names))
+
+rowSums(X_baseball) # home_field advantage has a 1 and neutral is 0
+colSums(X_baseball) # difference in number of home - away games
+head(X_baseball)
+```
+
+```{r baseball-model}
+m <- lm(baseball2024$margin ~ X_baseball - 1) # remove intercept
+summary(m)$sigma
+```
+
+```{r baseball-strengths}
+# Home field advantage
+coef(m)[1]
+
+# Team strengths
+strength <- coef(m)[-1]
+strength[length(strength)] <- 0
+
+teams <- teams |>
+  mutate(
+    strength = strength - mean(strength),
+    names    = factor(names, 
+                      levels = names[order(strength)])
+  ) |>
+  arrange(desc(strength))
+```
+
+```{r baseball-strength-plot}
+ggplot(teams,
+       aes(
+         x = strength,
+         y = names 
+       )) +
+  geom_point() +
+  labs(
+    x = "Strength",
+    y = "Team",
+    title = "2024 Big 12 College Baseball"
+  )
+```
+
+One aspect of these data that have not been addressed is the bias due to the
+way the 9th inning works in baseball. 
+In the bottom of the 9th inning, the home team immediately wins if they are 
+ever ahead of the away team. 
+This could happen sometime during the 9th inning or even before the bottom of 
+the 9th inning occurs. 
+The bias that results is likely a underestimate of the home field advantage
+because the home team scores less points than they could have. 
+
+## R packages
+
+Are there any or do we really have to do all of this by hand?
+

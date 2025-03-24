@@ -1,0 +1,68 @@
+# Expected Score
+
+```{r packages}
+library(tidyverse); theme_set(theme_bw())
+source("../../R/construct_home_away_matrix.R")
+source("../../R/make_teams.R")
+```
+
+## Pairwise Probabilities
+
+The starting point for developing approaches to modeling tournaments is a 
+matrix containing probabilities for one team (or individual) beating another
+team (or individual). 
+These probabilities can be calculated from 
+margin of victory, win-loss, or win-tie-loss models and thus the matrices
+can be constructed using the probabilities. 
+
+Many tournaments are played on neutral courts and thus the home advantage 
+term is generally not included. 
+But if venues exist within the tournament that would provide home advantage,
+e.g. the court is actually the home court for a team or the court is located
+geographically close to a team, 
+then the home advantage term could be computed. 
+
+For now, we will use the notation $p_{A,B}$ to denote the probability that team
+A beats team B. 
+
+For example, in the 2024 NFL season, we can use the margin of victory model to
+compute the matrix for teams who qualified for the playoffs,
+i.e. the post-season tournament. 
+
+```{r nfl}
+nfl2024_tmp <- read.csv("../../data/nfl.csv") |>
+  filter(schedule_season == 2024,
+         !schedule_playoff) |>
+  mutate(
+    margin = score_home - score_away
+  ) |>
+  rename(
+    home = team_home,
+    away = team_away
+  )
+
+teams <- make_teams(nfl2024_tmp)
+
+nfl2024 <- nfl2024_tmp |>
+  mutate(
+    home = factor(home, levels = teams),
+    away = factor(away, levels = teams)
+  )
+
+X <- construct_home_away_matrix(nfl2024)
+
+m <- lm(nfl2024$margin ~ X)
+
+# Calculate team strengths
+strength <- coef(m)[-1] # move home advantage
+strength[length(strength)] <- 
+
+# Obtain playoff teams by name
+playoff_teams <- teams |>
+  filter(grepl("Chiefs|Bills|Ravens|Texans|Chargers|Steelers|Broncos|Packers|Commanders|Vikings|Rams|Buccaneers|Eagles|Lions", 
+               names)) 
+```
+
+
+
+## 
