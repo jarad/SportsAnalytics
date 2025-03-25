@@ -2,6 +2,7 @@
 
 ```{r packages}
 library("tidyverse"); theme_set(theme_bw())
+library("DT")
 ```
 
 A simple example of offense-defense data is this fictitious collection of 4 
@@ -320,6 +321,19 @@ baseball <- read.csv("../../data/college_baseball_2024.csv") |>
   select(Date, Home_Field, home, away, home_score, away_score)
 ```
 
+```{r baseball-exploratory}
+baseball  |>
+  datatable(
+    filter = "top"
+  )
+```
+
+Summary statistics
+
+```{r baseball-summary}
+summary(baseball)
+```
+
 ```{r baseball-construct-model-matrix}
 # Construct factors for teams
 teams <- data.frame(
@@ -353,10 +367,12 @@ m <- lm(Y ~ 0 + X) # 0 removes intercept (so does -1)
 summary(m)
 ```
 
-```{r baseball-ratings}
-home_advantage <- coef(m)[1]
-sd             <- summary(m)$sigma
+```{r baseball-parameters}
+(home_advantage <- coef(m)[1])
+(sd             <- summary(m)$sigma)
+```
 
+```{r baseball-ratings}
 ratings <- data.frame(
   team = rep(teams$names, times = 2),
   type = rep(c("offense", "defense"), each = nrow(teams)),
@@ -405,6 +421,18 @@ ggplot(p_ratings,
        )) +
   geom_bar(stat="identity") + 
   facet_wrap(~type, nrow = 1, scales = "free_x")
+```
+
+```{r ratings-alternative-plot}
+ggplot(p_ratings |>
+        filter(type != "strength") |>
+         mutate(rating = rating - 5),
+       aes(
+         x = rating,
+         y = team,
+         fill = type
+       )) +
+  geom_bar(stat="identity")
 ```
 
 ### Iowa Football
