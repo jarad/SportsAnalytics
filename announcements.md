@@ -1,5 +1,11 @@
 # Announcements
 
+## 2025-03-25
+
+- Play-by-play data for Friday Apr 4
+- Project proposal due Thursday Mar 27
+- I'm gone next week - Dr. Nettleton is back
+
 ## 2025-03-13
 
 - HW05 due TODAY
