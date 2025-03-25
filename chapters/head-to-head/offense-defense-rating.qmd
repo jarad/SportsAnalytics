@@ -101,19 +101,20 @@ when two teams play each other, the score is expected to be the
 home advantage $\eta$ plus the difference in strengths between the two
 teams $\theta - \delta$.
 Thus, only the difference between the offense and defense rating is identifiable.
-
+and we can arbitrarily add a constant to all of the $\theta$ and $\delta$ values. 
 
 
 
 ### Regression
 
 
-If we assume $\epsilon_i \stackrel{ind}{\sim} N(0,\sigma^2)$,
+If we assume $\epsilon_g^H, \epsilon_g^A  \stackrel{ind}{\sim} N(0,\sigma^2)$,
 then this is a linear regression model. 
 
 Since we have both the offensive parameters ($\theta$s) and defensive 
 parameters ($\delta$s), 
 we will need to construct a home matrix $X^H$ and an away matrix $X^A$. 
+
 For $X^H$ we have 
 $$X^H_{g,t} = \left\{
 \begin{array}{rl}
@@ -168,7 +169,7 @@ all(rowSums(X_a) == 1)
 
 
 
-To see how it is a linear regression model, 
+To see how this is a linear regression model, 
 we can construct a regression model using matrix algebra
 $$
 Y = \left[ \begin{array}{c} 
@@ -182,7 +183,11 @@ S^A_1 \\ \vdots \\ S^A_G
 \eta \\ 
 \theta_1 \\ \vdots \\ \theta_T \\
 \delta_1 \\ \vdots \\ \delta_T 
-\end{array} \right] + \epsilon 
+\end{array} \right] + 
+\left[ \begin{array}{c}
+\epsilon_1^H \\ \vdots \\ \epsilon_G^H \\
+\epsilon_1^A \\ \vdots \\ \epsilon_G^A 
+\end{array} \right]
 = X\beta + \epsilon
 $$
 where 
@@ -234,6 +239,11 @@ teams <- data.frame(
   mutate(
     strength = offense + defense
   )
+
+teams |> 
+  datatable(filter = "top") |>
+  formatRound(columns = c('offense', 'defense', 'strength'), 
+              digits = 2)
 ```
 
 
@@ -293,10 +303,12 @@ pt(expected_margin / (sd * sqrt(2)), df = summary(m)$df[2])
 
 ## Examples
 
-### Baseball
+### 2023 Intraconference Big12 Baseball 
 
 
 ```{r baseball-data}
+# Big 12 2023 Intraconference games
+# I'm not sure why the file uses 2024
 baseball <- read.csv("../../data/college_baseball_2024.csv") |>
   
   # Create home/away teams and scores
@@ -321,11 +333,11 @@ baseball <- read.csv("../../data/college_baseball_2024.csv") |>
   select(Date, Home_Field, home, away, home_score, away_score)
 ```
 
+#### Exploratory
+
 ```{r baseball-exploratory}
 baseball  |>
-  datatable(
-    filter = "top"
-  )
+  datatable(filter = "top", rownames = FALSE)
 ```
 
 Summary statistics
@@ -333,6 +345,8 @@ Summary statistics
 ```{r baseball-summary}
 summary(baseball)
 ```
+
+#### Modeling
 
 ```{r baseball-construct-model-matrix}
 # Construct factors for teams
@@ -367,6 +381,8 @@ m <- lm(Y ~ 0 + X) # 0 removes intercept (so does -1)
 summary(m)
 ```
 
+#### Parameter estimates
+
 ```{r baseball-parameters}
 (home_advantage <- coef(m)[1])
 (sd             <- summary(m)$sigma)
@@ -391,18 +407,25 @@ ratings <- data.frame(
   ) |>
   arrange(desc(strength))
 
-ratings 
+ratings |> 
+  datatable(filter = "top", rownames = FALSE) |>
+  formatRound(columns = c('offense', 'defense', 'strength'),
+              digits = 2)
 ```
+
+We can compare these ratings to the 
+[Big 12 standings from 2023](http://big12sports.com/standings.aspx?standings=190). 
 
 Let's plot these ratings
 
 ```{r baseball-ratings-plot}
+constant <- 5
 
 p_ratings <- ratings |>
   mutate(
-    offense = offense + 5,
-    defense = defense + 5,
-    strength = strength + 10
+    offense = offense   + constant,
+    defense = defense   + constant,
+    strength = offense + defense
   ) |>
   pivot_longer(
     cols = offense:strength,
@@ -426,7 +449,7 @@ ggplot(p_ratings,
 ```{r ratings-alternative-plot}
 ggplot(p_ratings |>
         filter(type != "strength") |>
-         mutate(rating = rating - 5),
+         mutate(rating = rating - constant),
        aes(
          x = rating,
          y = team,
@@ -435,8 +458,47 @@ ggplot(p_ratings |>
   geom_bar(stat="identity")
 ```
 
-### Iowa Football
+#### Predictions
 
+Let's suppose we are interested in calculating the probability in a 
+home-and-home series between Oklahoma and Oklahoma State. 
+
+```{r baseball-predictions}
+ratings |> filter(team %in% c('Oklahoma','Oklahoma State'))
+
+# @ Oklahoma
+(expected_home <- home_advantage + 
+    ratings$offense[ratings$team == "Oklahoma"] - 
+    ratings$defense[ratings$team == "Oklahoma State"])
+
+(expected_away <- 
+    ratings$offense[ratings$team == "Oklahoma State"] - 
+    ratings$defense[ratings$team == "Oklahoma"])
+
+(expected_margin <- expected_home - expected_away)
+
+(probability_Oklahoma_win_home <- 
+    pt(expected_margin / (sd * sqrt(2)), 
+       df = summary(m)$df[2]))
+
+# @ Oklahoma State
+(expected_home <- home_advantage + 
+    ratings$offense[ratings$team == "Oklahoma State"] - 
+    ratings$defense[ratings$team == "Oklahoma"])
+
+(expected_away <- 
+    ratings$offense[ratings$team == "Oklahoma"] - 
+    ratings$defense[ratings$team == "Oklahoma State"])
+
+(expected_margin <- expected_home - expected_away)
+
+(probability_Oklahoma_win_away <- 
+    1 - pt(expected_margin / (sd * sqrt(2)), # note the 1 -
+           df = summary(m)$df[2])) 
+
+# Probability Oklahoma wins both (assuming independence)
+probability_Oklahoma_win_home * probability_Oklahoma_win_away
+```
 
 
 ## Rating Systems
