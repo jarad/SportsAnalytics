@@ -1,0 +1,15 @@
+{
+  "hash": "59620c196ab0b6eb1f3712f3ce720685",
+  "result": {
+    "engine": "knitr",
+    "markdown": "# Expected Score\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(tidyverse); theme_set(theme_bw())\n```\n\n::: {.cell-output .cell-output-stderr}\n\n```\n── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──\n✔ dplyr     1.1.4.9000     ✔ readr     2.1.5     \n✔ forcats   1.0.0          ✔ stringr   1.5.1     \n✔ ggplot2   3.5.1          ✔ tibble    3.2.1     \n✔ lubridate 1.9.3          ✔ tidyr     1.3.1     \n✔ purrr     1.0.2          \n── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──\n✖ dplyr::filter() masks stats::filter()\n✖ dplyr::lag()    masks stats::lag()\nℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors\n```\n\n\n:::\n\n```{.r .cell-code}\nsource(\"../../R/construct_home_away_matrix.R\")\nsource(\"../../R/make_teams.R\")\n```\n:::\n\n\n\n\n## Pairwise Probabilities\n\nThe starting point for developing approaches to modeling tournaments is a \nmatrix containing probabilities for one team (or individual) beating another\nteam (or individual). \nThese probabilities can be calculated from \nmargin of victory, win-loss, or win-tie-loss models and thus the matrices\ncan be constructed using the probabilities. \n\nMany tournaments are played on neutral courts and thus the home advantage \nterm is generally not included. \nBut if venues exist within the tournament that would provide home advantage,\ne.g. the court is actually the home court for a team or the court is located\ngeographically close to a team, \nthen the home advantage term could be computed. \n\nFor now, we will use the notation $p_{A,B}$ to denote the probability that team\nA beats team B. \n\nFor example, in the 2024 NFL season, we can use the margin of victory model to\ncompute the matrix for teams who qualified for the playoffs,\ni.e. the post-season tournament. \n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\nnfl2024_tmp <- read.csv(\"../../data/nfl.csv\") |>\n  filter(schedule_season == 2024,\n         !schedule_playoff) |>\n  mutate(\n    margin = score_home - score_away\n  ) |>\n  rename(\n    home = team_home,\n    away = team_away\n  )\n\nteams <- make_teams(nfl2024_tmp)\n\nnfl2024 <- nfl2024_tmp |>\n  mutate(\n    home = factor(home, levels = teams),\n    away = factor(away, levels = teams)\n  )\n\nX <- construct_home_away_matrix(nfl2024)\n\nm <- lm(nfl2024$margin ~ X)\n\n# Calculate team strengths\nstrength <- coef(m)[-1] # move home advantage\nstrength[length(strength)] <- \n\n# Obtain playoff teams by name\nplayoff_teams <- teams |>\n  filter(grepl(\"Chiefs|Bills|Ravens|Texans|Chargers|Steelers|Broncos|Packers|Commanders|Vikings|Rams|Buccaneers|Eagles|Lions\", \n               names)) \n```\n:::\n\n\n\n\n\n\n## ",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

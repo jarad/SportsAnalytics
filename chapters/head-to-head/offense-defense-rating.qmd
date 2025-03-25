@@ -35,7 +35,7 @@ Using the scores allows us to estimate offense and defense team strengths.
 
 A model for the number of points scored by the home team is 
 
-$$S^H_g = \eta_O + \theta_{H[g]} - \delta_{A[g]} + \epsilon^H_g$$
+$$S^H_g = \eta + \theta_{H[g]} - \delta_{A[g]} + \epsilon^H_g$$
 
 where, for game $g$,
 
@@ -50,17 +50,17 @@ home score.
 
 The parameters are 
 
-- $\eta_O$ is the offensive home advantage, 
+- $\eta$ is the offensive home advantage, 
 - $\theta_t$ is the offensive strength of team $t$, and
 - $\delta_t$ is the defense strength of team $t$.
 
 The expected home score when team $H$ is at home playing against team $A$ is 
 
-$$E\left[S^H\right] = \eta_O + \theta_{H} - \delta_{A}.$$
+$$E\left[S^H\right] = \eta + \theta_{H} - \delta_{A}.$$
 We can build a similar model for the away team score. 
 A model for the number of points scored by the away team is 
 
-$$S^A_g = \eta_D + \theta_{A[g]} - \delta_{H[g]} + \epsilon^A_g$$
+$$S^A_g = \theta_{A[g]} - \delta_{H[g]} + \epsilon^A_g$$
 
 where, for game $g$,
 
@@ -71,13 +71,9 @@ This error arises because if two teams play each other repeatedly we would
 expect the away score would be random around the expected
 away score.
 
-The parameters are 
-
-- $\eta_D$ is the defensive home advantage.
-
 The expected away score when team $H$ is at home playing against team $A$ is 
 
-$$E\left[S^A\right] = \eta_D + \theta_{A} - \delta_{H}.$$
+$$E\left[S^A\right] = \theta_{A} - \delta_{H}.$$
 
 We can utilize these models to calculate the expected margin of victory $M$ for 
 home team $H$ playing away team $A$:
@@ -85,13 +81,13 @@ $$\begin{array}{rl}
 E[M] 
 &= E[S^H - S^A] \\
 &= E[S^H] - E[S^A] \\
-&= \eta_O + \theta_H - \delta_A - (\eta_D + \theta_A - \delta_H) \\
-&= (\eta_O - \eta_D) + (\theta_H + \delta_H) - (\theta_A + \delta_A) 
+&= \eta + \theta_H  - \delta_A - (\eta_D + \theta_A - \delta_H) \\
+&= \eta + (\theta_H + \delta_H) - (\theta_A + \delta_A) 
 \end{array}
 $$
 where 
 
-- $\eta_O - \eta_D$ is the home advantage,
+- $\eta$ is the home advantage,
 - $\theta_H - \delta_H$ is the strength of the home team, and
 - $\theta_A - \delta_A$ is the strength of the away team.
 
@@ -120,16 +116,19 @@ we will need to construct a home matrix $X^H$ and an away matrix $X^A$.
 For $X^H$ we have 
 $$X^H_{g,t} = \left\{
 \begin{array}{rl}
-1 & \mbox{if team $t$ is the home team in game $g$} \\
+1 & \mbox{if team $t$ is the {\bf home} team in game $g$} \\
 0 & \mbox{otherwise}
 \end{array} \right.$$
 
+For $X^A$ we have 
+$$X^A_{g,t} = \left\{
+\begin{array}{rl}
+1 & \mbox{if team $t$ is the {\bf away} team in game $g$} \\
+0 & \mbox{otherwise}
+\end{array} \right.$$
 
-For the analysis that follows, 
-we will construct a model matrix $X$ where 
-$X_{g,t} = 1$ if team $t$ is the home team in game $g$,  
-$X_{g,t} = -1$ if team $t$ is the away team in game $g$,
-$X_{g,t} = 0$ otherwise.
+Compared to the model matrices we created earlier, 
+we have no negative values (-1) in these matrices. 
 
 ```{r model-matrix}
 construct_matrix <- function(d, Col = "home") {
@@ -176,26 +175,41 @@ S^H_1 \\ \vdots \\ S^H_G \\
 S^A_1 \\ \vdots \\ S^A_G 
 \end{array} \right] 
 = \left[ \begin{array}{cc} 
-1 & X_h & 0 & -X_a \\ 0 & X_a & 1 & -X_h
+1 & X_h & -X_a \\ 0 & X_a & -X_h
 \end{array} \right] 
 \left[ \begin{array}{c} 
-\eta^O \\ \theta_1 \\ \vdots \\ \theta_T \\
-\eta^D \\ \delta_1 \\ \vdots \\ \delta_T 
+\eta \\ 
+\theta_1 \\ \vdots \\ \theta_T \\
+\delta_1 \\ \vdots \\ \delta_T 
 \end{array} \right] + \epsilon 
 = X\beta + \epsilon
 $$
-where $1$ ($0$) is shorthand for a $G \times 1$ vector of all 1s (0s). 
+where 
+
+- $G$ is the number of games,
+- $T$ is the number of teams, and
+- $1$ ($0$) is shorthand for a $G \times 1$ vector of all 1s (0s), and
+- $\epsilon$ is a $G\times 2$ vector with $\epsilon \sim N(0,\sigma^2 \mathrm{I})$.
+
+
+
+
 
 
 
 Thus, we can estimate the parameters in this model using linear regression.
 
 ```{r regression}
+# Construct score vector
 Y <- c(d$home_score, d$away_score)
+
+# Construct (complete) model matrix
 X <- rbind(
-  cbind (1, X_h, -X_a),
-  cbind(-1, X_a, -X_h)
+  cbind(1, X_h, -X_a),
+  cbind(0, X_a, -X_h)
 )
+
+# Fit model
 m <- lm(Y ~ 0 + X) # 0 removes intercept (so does -1) 
 summary(m)
 ```
@@ -227,29 +241,30 @@ teams <- data.frame(
 Let $S^H$ ($S^A$) be the score for the home (away) team in an upcoming game. 
 The regression model assumes
 $$
-S^H \sim N(\eta_O + \theta_H - \delta_A, \sigma^2) 
+S^H \sim N(\eta + \theta_H - \delta_A, \sigma^2) 
 \quad \mbox{and (independently)} \quad 
-S^A \sim N(\eta_D + \theta_A - \delta_H, \sigma^2). 
+S^A \sim N(\theta_A - \delta_H, \sigma^2). 
 $$
 Thus, the margin of victory $M$ is 
 $$
 M = S^H - S^A \sim N(E[M], 2\sigma^2)
 $$
-where $E[M]$ is given above. 
+where 
+$$E[M] = \eta + (\theta_H + \delta_H) - (\theta_A + \delta_A).$$
+
+
+
 To find the probability the home team wins we use 
 $$P(M > 0) 
 = P\left( T_v > \frac{-E[M]}{\sigma\sqrt{2}} \right) 
 = P\left( T_v < \frac{ E[M]}{\sigma\sqrt{2}} \right)
 $$
 where $T_v$ is a T-distribution with $v$ is the degrees of freedom.
-The degrees of freedom can be calculated using $v = n-p$ 
-with $n$ is the number of games times 2 (due to home and away scores being used)
-and $p$ is the number of teams times 2 (due to estimating offense and defense
-ratings). 
+The degrees of freedom can be calculated using $v = 2(G-T)$.
 
-If $n >> p$ (which is certainly not true in our simple example), 
-then $T_v \stackrel{d}{\sim} Z$ 
-(where $\stackrel{d}{\sim}$ means approximately equal in distribution).
+If $G >> T$ (which is certainly not true in our simple example), 
+then $T_v \stackrel{d}{\approx} Z$ 
+(where $\stackrel{d}{\approx}$ means approximately equal in distribution).
 Thus, we can calculate the probability using
 $$
 P(M > 0) \approx P\left( Z < \frac{ E[M]}{\sigma\sqrt{2}} \right).
@@ -258,7 +273,7 @@ $$
 The standard deviation here is 
 
 ```{r predictive_sd}
-(sd <- summary(m)$sigma * sqrt(2))
+(sd <- summary(m)$sigma)
 ```
 
 
@@ -271,7 +286,7 @@ expected_margin <- as.numeric(coef(m)[1] +
                                 teams[2, "strength"]) 
 
 # Probability of Victory: Team 1 (Home) - Team 2 (Away)
-pt(expected_margin / sd, df = summary(m)$df[2])
+pt(expected_margin / (sd * sqrt(2)), df = summary(m)$df[2])
 ```
 
 
@@ -326,19 +341,19 @@ X_a <- construct_matrix(baseball, "away")
 
 Fit the model
 
-```{r}
+```{r baseball-model}
 Y <- c(baseball$home_score, 
        baseball$away_score)
 
 X <- rbind(
-  cbind( 1, X_h, -X_a),
-  cbind(-1, X_a, -X_h)
+  cbind(1, X_h, -X_a),
+  cbind(0, X_a, -X_h)
 )
 m <- lm(Y ~ 0 + X) # 0 removes intercept (so does -1) 
 summary(m)
 ```
 
-```{r teams}
+```{r baseball-ratings}
 home_advantage <- coef(m)[1]
 sd             <- summary(m)$sigma
 
@@ -359,9 +374,38 @@ ratings <- data.frame(
     strength = offense + defense
   ) |>
   arrange(desc(strength))
+
+ratings 
 ```
 
+Let's plot these ratings
 
+```{r baseball-ratings-plot}
+
+p_ratings <- ratings |>
+  mutate(
+    offense = offense + 5,
+    defense = defense + 5,
+    strength = strength + 10
+  ) |>
+  pivot_longer(
+    cols = offense:strength,
+    names_to = "type",
+    values_to = "rating"
+  ) |>
+  mutate(
+    team = factor(team, levels = ratings$team[order(ratings$strength)]),
+    type = factor(type, levels = c("offense","defense","strength"))
+  )
+
+ggplot(p_ratings,
+       aes(
+         x = rating,
+         y = team
+       )) +
+  geom_bar(stat="identity") + 
+  facet_wrap(~type, nrow = 1, scales = "free_x")
+```
 
 ### Iowa Football
 
