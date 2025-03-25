@@ -437,3 +437,20 @@ ggplot(p_ratings |>
 
 ### Iowa Football
 
+
+
+## Rating Systems
+
+### Kenpom.com
+
+Ken Pomeroy provides the types of ratings at [kenpom.com](https://kenpom.com/) for D-I college basketball:
+
+- ORtg: offense rating
+- DRtg: defense rating
+- NetRtg: strength rating
+
+Note that NetRtg = ORtg - DRtg. 
+
+Rather than estimating the home court advantage, 
+[these ratings assume a 3.75 points per game home court advantage](https://kenpom.com/blog/ratings-methodology-update/).
+
