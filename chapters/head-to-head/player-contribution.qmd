@@ -1,0 +1,189 @@
+# Player Contribution
+
+The goal of this chapter is to build models to account for individual 
+contributions toward a team. 
+
+```{r packages}
+library("tidyverse"); theme_set(theme_bw())
+library("DT")
+```
+
+Load necessary code
+
+```{r construct-matrix}
+source("../../R/construct_matrix.R")
+```
+
+## Models
+
+### Margin of Victory
+
+### Win-(tie-)loss
+
+### Offense-defense
+
+
+
+## Examples
+
+### FRC MOSE 2025
+
+The First Robotics Competition (FRC) is a high school robotics competition. 
+Each match in an FRC competition pits two alliances (red and blue) each
+composed of 3 robots from different teams. 
+The robots within an alliance cooperate and compete against the robots in the
+other alliance to score points. 
+The alliance with more points at the end wins the match. 
+
+
+
+```{r mose2025-data}
+tmp <- read_csv("../../data/frc_mose2025.csv")  
+
+# Create factor for all teams
+teams <- tmp |>
+  select(`Red 1`:`Blue 3`) |>
+  pivot_longer(everything()) |>
+  pull(value) |>
+  unique() |>
+  sort()
+
+mose2025 <- tmp |>
+  mutate(
+    `Red 1`  = factor(`Red 1`,  levels = teams),
+    `Red 2`  = factor(`Red 2`,  levels = teams),
+    `Red 3`  = factor(`Red 3`,  levels = teams),
+    `Blue 1` = factor(`Blue 1`, levels = teams),
+    `Blue 2` = factor(`Blue 2`, levels = teams),
+    `Blue 3` = factor(`Blue 3`, levels = teams)
+  )
+
+mose2025 |> datatable(filter = "top", rownames = FALSE)
+```
+
+Construct the model matrices.
+
+```{r mose2025-matrices}
+# Construct model matrices
+X_red <- construct_matrix(mose2025, "Red 1", 36) +
+  construct_matrix(mose2025, "Red 2", 36) +
+  construct_matrix(mose2025, "Red 3", 36) 
+
+X_blue <- construct_matrix(mose2025, "Blue 1", 36) +
+  construct_matrix(mose2025, "Blue 2", 36) +
+  construct_matrix(mose2025, "Blue 3", 36) 
+```
+
+#### Margin-of-victory
+
+```{r mose2025-margin-analysis}
+# Margin of victory
+margin <- mose2025$`Red Final` - mose2025$`Blue Final`
+X      <- X_red - X_blue
+
+# Fit model
+m <- lm(margin ~ 0 + X)
+summary(m)
+```
+
+Extract parameters
+
+```{r mose2025-margin-parameters}
+mose2025_margin <- data.frame(
+  team   = teams,
+  rating = coef(m)
+) |>
+  mutate(
+    rating = ifelse(is.na(rating), 0, rating),
+    rating = rating - mean(rating),
+    team   = factor(team, levels = team[order(rating)])
+  ) |>
+  arrange(desc(team))
+
+mose2025_margin |> 
+  datatable(filter = "top", 
+            rownames = FALSE) |>
+  formatRound(columns = "rating", digits = 1)
+```
+
+Let's plot the teams
+
+```{r mose2025-margin-plot}
+ggplot(mose2025_margin,
+       aes(
+         x = rating,
+         y = team
+       )) +
+  geom_bar(stat="identity") +
+  labs(
+    x = "Rating",
+    y = "Team",
+    title = "FRC MOSE 2025 - Qualification"
+  )
+```
+
+
+
+#### Offense-defense rating
+
+```{r mose2025-offense-defense-analysis}
+# Offense-defense analysis
+Y <- c(mose2025$`Red Final`, mose2025$`Blue Final`)
+
+X <- rbind(
+  cbind(X_red, -X_blue),
+  cbind(X_blue, -X_red)
+)
+
+# Fit model
+m <- lm(Y ~ 0 + X)
+summary(m)
+```
+
+Extract parameters
+
+```{r mose2025-offense-defense-parameters}
+mose2025_offense_defense <- data.frame(
+  team   = rep(teams, times = 2),
+  type   = rep(c("offense","defense"), each = length(teams)),
+  rating = coef(m)
+) |>
+  mutate(
+    rating = ifelse(is.na(rating), 0, rating),
+    rating = rating - mean(rating)
+  ) |>
+  pivot_wider(
+    names_from = "type", 
+    values_from = "rating") |>
+  mutate(
+    strength = offense + defense,
+    team    = factor(team, team[order(strength)])
+  ) |>
+  arrange(desc(team))
+
+mose2025_offense_defense |> 
+  datatable(filter = "top", 
+            rownames = FALSE) |>
+  formatRound(columns = c("offense","defense","strength"), digits = 1)
+```
+
+Let's plot the teams
+
+```{r mose2025-offense-defense-plot}
+ggplot(mose2025_offense_defense |>
+         pivot_longer(
+           offense:strength,
+           names_to = "type",
+           values_to = "rating"),
+       aes(
+         x = rating,
+         y = team
+       )) +
+  geom_bar(stat="identity") +
+  facet_wrap(~type) +
+  labs(
+    x = "Rating",
+    y = "Team",
+    title = "FRC MOSE 2025 - Qualification"
+  )
+```

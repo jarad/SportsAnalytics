@@ -20,7 +20,7 @@ book:
       - 07-win-loss.qmd
       - win-tie-loss.qmd
       - chapters/head-to-head/offense-defense-rating.qmd
-      - 08-player-contribution.qmd
+      - chapters/head-to-head/player-contribution.qmd
     - part: chapters/bracketology/bracketology.qmd
       chapters:
       - chapters/bracketology/expected-score.qmd
