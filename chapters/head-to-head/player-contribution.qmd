@@ -38,7 +38,7 @@ opposing team, your overall and defensive contribution may look poor.
 statistics, like those discussed below, 
 keep track of all the other players on the court and adjusts accordingly. 
 Recall that multiple regression models 
-``adjust for other explanatory variables''.
+"adjust for other explanatory variables".
 
 ## Models
 
@@ -109,7 +109,7 @@ utilizing both home and away scores.
 Let $S^H_g$ ($S_A_g$) be the points scored by the home team while a combination 
 of players are on the court.
 Assume
-$$S^H_g = \sum_{p \in H[g]} \theta_p - \sum_{p\in A[g]} \delta_p+ \epsilon^H_g$$
+$$S^H_g = \sum_{p \in H[g]} \theta_p - \sum_{p\in A[g]} \delta_p + \epsilon^H_g$$
 and 
 $$S^A_g = \sum_{p \in A[g]} \theta_p - \sum_{p\in H[g]} \delta_p+ \epsilon^A_g$$
 
@@ -363,3 +363,55 @@ The interpretation of $\eta$ would be *per unit time* using whatever time
 units were used for $T_g$. 
 To get the entire home advantage, we would calculate $\eta \sum_{g=1}^G T_g$. 
 A similar change can be made in the offense-defense model for $S^H_g$. 
+
+### Probability
+
+Probability calculations in these models is performed similarly to probability
+calculations in the associated margin of victory, win-(tie)-loss, or 
+offense-defense models.
+Since in these models we are looking at the contribution of players,
+for the probability calculation we will need to determine which combination
+of players we are looking at. 
+Once we have determined those players, 
+we will calculate the appropriate difference in ratings. 
+
+
+### Small counts
+
+I have previously mentioned that in sports with small counts, 
+e.g. soccer or hockey, 
+it may be preferable to utilize a win-(tie-)loss model. 
+Even in high scoring sports, e.g. basketball, 
+when we are looking at a specific combination of players on the court, 
+then we may have a small number of points scored (for both sides) when 
+that specific combination is on the court. 
+Thus, we may want to look into use Poisson (or negative binomial) based models
+for the offense-defense rating.
+
+A Poisson model may look something like
+
+$$S^H_g \stackrel{ind}{\sim} Po(\lambda^H_g)$$
+with 
+$$\log(\lambda^H_g) = \sum_{p \in H[g]} \theta_p - \sum_{p\in A[g]} \delta_p.$$
+In these models, the interpretation of the parameters changed are are mostly
+easily understood as their multiplicative effect. 
+For example,
+$$E[S^H_g] = \left. \prod_{p \in H[g]} e^{\theta_p} \right/ \prod_{p \in A[g]} e^{\theta_p}.$$
+
+### Estimability
+
+Recall that identifiability is based on whether the parameters can be estimated
+with any data, i.e. the best data, while estimability is based on whether 
+parameters can be estimated with a particular data set. 
+Player contributions in some sports are very difficult to estimate with these 
+models because insufficient combinations of players are available. 
+Baseball and softball generally have the same set of players 
+playing the field and the battling order is the same. 
+Soccer generally has the same set of players on the field, and the sport is 
+low scoring.
+Volleyball generally has the same players in the same order on the court. 
+Even a sport like basketball can be affected by this issue if one player
+is immediately subbed in or out when another player is subbed
+(either on the same team or the other team). 
+
+
