@@ -1,11 +1,11 @@
-﻿Match,Start Time,Red 1,Red 2,Red 3,Blue 1,Blue 2,Blue 3,Red Final,Blue Final
+Match,Start Time,Red 1,Red 2,Red 3,Blue 1,Blue 2,Blue 3,Red Final,Blue Final
 Qualification 1  ,Fri 3/7 - 8:59 AM,4213,1810,5576,3928,167,6419,49,85
 Qualification 2  ,Fri 3/7 - 9:14 AM,1756,5968,4646,1939,8825,1987,147,115
-Qualification 3  ,Fri 3/7 - 9:23 AM,8112,3184,9031,1997,5809,5141,19,38
+Qualification 3  ,Fri 3/7 - 9:23 AM,,3184,9031,1997,5809,5141,19,38
 Qualification 4  ,Fri 3/7 - 9:37 AM,1736,3284,2718,4766,9570,7662,97,39
 Qualification 5  ,Fri 3/7 - 9:47 AM,5801,5126,1723,1806,1785,2357,86,55
 Qualification 6  ,Fri 3/7 - 9:56 AM,4522,1710,2996,4187,1763,9316,154,27
-Qualification 7  ,Fri 3/7 - 10:07 AM,4646,3928,8112,9031,1987,1756,102,129
+Qualification 7  ,Fri 3/7 - 10:07 AM,4646,3928,,9031,1987,1756,102,129
 Qualification 8  ,Fri 3/7 - 10:15 AM,9570,3284,6419,7662,1736,167,22,79
 Qualification 9  ,Fri 3/7 - 10:24 AM,5141,3184,4213,5801,5968,8825,81,89
 Qualification 10  ,Fri 3/7 - 10:33 AM,9316,5126,1939,4766,1763,1810,63,67
