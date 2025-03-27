@@ -82,7 +82,7 @@ $$\begin{array}{rl}
 E[M] 
 &= E[S^H - S^A] \\
 &= E[S^H] - E[S^A] \\
-&= \eta + \theta_H  - \delta_A - (\eta_D + \theta_A - \delta_H) \\
+&= \eta + \theta_H  - \delta_A - (\theta_A - \delta_H) \\
 &= \eta + (\theta_H + \delta_H) - (\theta_A + \delta_A) 
 \end{array}
 $$
@@ -241,7 +241,7 @@ teams <- data.frame(
   )
 
 teams |> 
-  datatable(filter = "top") |>
+  datatable(filter = "top", rownames = FALSE) |>
   formatRound(columns = c('offense', 'defense', 'strength'), 
               digits = 2)
 ```
@@ -389,6 +389,8 @@ summary(m)
 ```
 
 ```{r baseball-ratings}
+constant <- mean(baseball$away_score)
+
 ratings <- data.frame(
   team = rep(teams$names, times = 2),
   type = rep(c("offense", "defense"), each = nrow(teams)),
@@ -396,7 +398,7 @@ ratings <- data.frame(
 ) |>
   mutate(
     rating = ifelse(is.na(rating), 0, rating),
-    rating = rating - mean(rating)
+    rating = rating - mean(rating) + constant
   ) |>
   pivot_wider(
     names_from = type,
@@ -405,7 +407,10 @@ ratings <- data.frame(
   mutate(
     strength = offense + defense
   ) |>
-  arrange(desc(strength))
+  arrange(desc(strength)) |>
+  mutate(
+    team = factor(team, levels = team)
+  )
 
 ratings |> 
   datatable(filter = "top", rownames = FALSE) |>
@@ -419,8 +424,6 @@ We can compare these ratings to the
 Let's plot these ratings
 
 ```{r baseball-ratings-plot}
-constant <- 5
-
 p_ratings <- ratings |>
   mutate(
     offense = offense   + constant,
@@ -447,15 +450,14 @@ ggplot(p_ratings,
 ```
 
 ```{r ratings-alternative-plot}
-ggplot(p_ratings |>
-        filter(type != "strength") |>
-         mutate(rating = rating - constant),
+ggplot(ratings,
        aes(
-         x = rating,
-         y = team,
-         fill = type
+         ymin = defense,
+         ymax = defense + offense,
+         x = team
        )) +
-  geom_bar(stat="identity")
+  geom_linerange() +
+  coord_flip()
 ```
 
 #### Predictions
