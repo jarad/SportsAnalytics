@@ -106,7 +106,7 @@ Rather than only using the margin of victory (or the win/tie/loss result)
 we can also estimate offense and defense contribution of the players by 
 utilizing both home and away scores.
 
-Let $S^H_g$ ($S_A_g$) be the points scored by the home team while a combination 
+Let $S^H_g$ ($S^A_g$) be the points scored by the home team while a combination 
 of players are on the court.
 Assume
 $$S^H_g = \sum_{p \in H[g]} \theta_p - \sum_{p\in A[g]} \delta_p + \epsilon^H_g$$
