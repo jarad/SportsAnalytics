@@ -1,5 +1,12 @@
 # Announcements
 
+## 2025-03-27
+
+- Project proposal due today
+- Plan: Play-by-play data request on discussion board (due next Fri)
+- Plan: Player contribution analysis (due next Thur)
+- Dr. Nettleton here next week
+
 ## 2025-03-25
 
 - Play-by-play data for Friday Apr 4
