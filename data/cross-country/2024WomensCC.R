@@ -13,7 +13,12 @@ read_race <- function(foo) {
              delim  = ":",
              cols_remove = FALSE) |>
     mutate(race = gsub(".csv", "", foo),
-           minutes = as.numeric(t_min) + as.numeric(t_sec) / 60)
+           minutes = as.numeric(t_min) + as.numeric(t_sec) / 60,
+           distance = case_when(
+             grepl("Cyclone", race) ~ 5,
+             grepl("Dirksen", race) ~ 5,
+             .default = 6
+           ))
 }
 
 results <- list()
@@ -23,4 +28,4 @@ for (i in 1:length(races)) {
 }
 
 bind_rows(results) |>
-  write_rds("../2024WomensCC.rds")
+  write_csv("../2024WomensCC.csv")
