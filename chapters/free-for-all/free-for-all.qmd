@@ -1,0 +1,27 @@
+# Free-for-all
+
+Free-for-all sports are typically measured in time (or points or distance) 
+and the time or points an athlete (or team) earns during an event may be 
+relatively unaffected by time or points another athlete earns. 
+Ultimately the ranking of athletes is according to the time in the event.  
+
+Some examples of these types of sports include
+
+- cross-country running
+- decathlon
+- long jump
+- yacht racing
+
+Most of the time, we will have the actual time earned for each individual
+athlete. 
+Thus, we can model this time at different events to determine the relative 
+ability of athletes. 
+When modeling time, we can utilize regression models. 
+
+Some of the time, we will only have a ranking (or ordering) of the athletes at
+an event. 
+An example of ranking-only data is drafting athletes where you only know the
+first draft pick, the second draft pick, and so on. 
+Alternatively, even if we could record time, perhaps the time was not 
+reported and thus we only have a ranking. 
+Alternative models will need to be used in this situation. 

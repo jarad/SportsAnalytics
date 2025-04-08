@@ -1,0 +1,414 @@
+# Time Models
+
+```{r packages}
+library("tidyverse"); theme_set(theme_bw())
+library("ggResidpanel")
+library("emmeans")
+library("lme4")
+library("DT")
+
+options(width = 120)
+```
+
+## Models
+
+### Regression
+
+Recall the linear regression model, 
+where for observation $i = \{1,2,\ldots,n \}$,
+$$ 
+Y_i = \beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2} + \cdots + \beta_j X_{i,j} + \epsilon_i, \quad \epsilon_i \stackrel{ind}{\sim} N(0,\sigma^2)
+$$
+where 
+
+- $Y_i$ be the value of the response variable and
+- $X_{i,j}$ be value of the $j$th explanatory variable 
+
+In modeling free-for-all data, 
+the response variable will be the time (or points) for a athlete (or team)
+at a specific event. 
+The explanatory variables are determined by the analyst,
+but will generally include the following
+
+- event
+- athlete
+
+and possibly additional explanatory variables such as weather conditions. 
+
+Since event and athlete are categorical variables, 
+statistical software will automatically construct dummy variables for us. 
+In R, the first event and athlete will be the reference level and then
+dummy variables will be constructed for every other event and athlete. 
+
+Thus, the intercept will be interpreted to be the mean time  
+for the reference athlete at the reference event. 
+The coefficients for the dummy variables for event will then be the 
+expected increase in time at that event compared to the reference 
+event after adjusting for athlete.  
+The coefficients for the dummy variables for athlete will then be the 
+expected increase in time for that athlete compared to the reference 
+athlete after adjusting for event. 
+
+
+
+
+
+### Regression (log response)
+
+An alternative model for free-for-all time data is to utilize the logarithm
+of time as the response variable. 
+
+Let $Y$ be the original response variable. The linear regression model using the logarithm of the original response variable
+looks like
+$$ 
+\log(Y_i) = \beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2} + \cdots + \beta_j X_{i,j} + \epsilon_i, \quad \epsilon_i \stackrel{ind}{\sim} N(0,\sigma^2)
+$$
+
+Interpretation of parameters will occur on the anti-log (or exponential)
+scale. 
+For example, 
+
+- $e^{\beta_0}$ is the median time for the reference athlete at the reference event
+- $e^{\beta_j}$ is the multiplicative change in median from the reference to 
+non-reference level
+
+Exponentiated coefficients for the dummy variables for event will be 
+the multiplicative change in median time for that event compared to the
+reference event after adjusting for athlete.  
+Exponentiated coefficients for the dummy variables for athlete will be 
+the multiplicative change in median time for that athlete compared to the
+reference athlete after adjusting for event.
+
+
+
+
+
+### Mixed effect regression
+
+A mixed effect regression model that includes a random effect for athlete is
+
+$$ 
+Y_i = \beta_0 + \beta_1 X_{i,1} + \cdots + \beta_j X_{i,j} + \alpha_{p[i]} + \epsilon_i, 
+\quad \epsilon_i \stackrel{ind}{\sim} N(0,\sigma^2), 
+\quad \alpha_p \stackrel{ind}{\sim} N(0,\sigma_\alpha^2)
+$$
+where
+
+- $p[i]$ is the athlete for observation $i$ and
+- $\alpha_p$ is the random effect for athlete $p$.
+
+Note that the $\alpha_p$ are centered at 0 due to their distribution
+having a mean of 0. 
+Thus, a random effect of 0 is an average athlete. 
+
+Interpretation of parameters changes slightly due to the centering of athletes
+abilities. 
+Now, 
+
+- $\beta_0$ is the expected time for an average athlete at the reference
+event,
+- $\beta_j$ is the expected increase in time for event $j$ compared to the 
+reference event after adjusting for athlete, and
+- $\alpha_p$ is the expected increase in time for athlete $p$ compared to the
+average athlete after adjusting for event.
+
+
+
+### Mixed effect regression (log response)
+
+Let $Y$ be the original response. 
+A mixed effect regression model using the logarithm of this original response
+is
+$$ 
+\log(Y_i) = \beta_0 + \beta_1 X_{i,1} + \cdots + \beta_j X_{i,j} + \alpha_{p[i]} + \epsilon_i, 
+\quad \epsilon_i \stackrel{ind}{\sim} N(0,\sigma^2), 
+\quad \alpha_p \stackrel{ind}{\sim} N(0,\sigma_\alpha^2)
+$$
+
+To interpret parameters, it is convenient to exponetiate. 
+Now, 
+
+- $\exp(\beta_0)$ is the median time for an average athlete at the reference
+event,
+- $exp(\beta_j)$ is the multiplicative change in time for event $j$ compared to the 
+reference event after adjusting for athlete, and
+- $exp(\alpha_p)$ is the multiplicative change in time for athlete $p$ compared to the
+average athlete after adjusting for event.
+
+
+
+
+## Examples
+
+### Iowa State University Women's 2024 Cross-Country 
+
+```{r cc}
+cc <- read_csv("../../data/2024WomensCC.csv") |>
+  mutate(
+    race = factor(race, 
+                  levels = c(
+                    "2024CyclonePreview",
+                    "2024GreenoDirksenCrossCountryInvitational",
+                    "2024NuttycombeInvitationalChampionship",
+                    "2024WisconsinPreNationalsChampionship",
+                    "2024_Big_12_Conference_Cross_Country_Championship",
+                    "2024_NCAA_Division_I_Midwest_Region_Cross_Country_Championships",
+                    "2024_NCAA_Division_I_Cross_Country_Championships"
+                  ))
+  )
+
+cyclone_athletes <- cc |>
+  filter(TEAM == "Iowa State") |>
+  pull(NAME)
+```
+
+```{r cc-exploratory-number-of-races}
+cc |> 
+  group_by(NAME) |>
+  summarize(n = n()) |>
+  ggplot(aes(x = n)) +
+  geom_histogram(binwidth = 1) +
+  labs(
+    title = "Iowa State University Women's 2024 Cross-Country",
+    x = "Number of Races"
+  )
+```
+
+```{r cc-exploratory-mean-times}
+cc |>
+  group_by(race) |>
+  summarize(mean_time = mean(minutes)) 
+```
+
+```{r cc-exploratory-times}
+ggplot(cc,
+       aes(x = minutes)) +
+  geom_histogram(bins = 50) +
+  facet_wrap(~race)
+```
+
+Build a model to estimate Cyclone runners. 
+This model should adjust for known (or suspected) explanatory variables. 
+An obvious one is the course. 
+
+
+#### Linear regression model
+
+```{r cc-lm-model}
+mf <- lm(minutes ~ race + NAME, data = cc)
+```
+
+```{r cc-lm-diagnostics}
+resid_panel(mf)
+```
+While we can run F-tests, 
+these are not so relevant because we already knew (or highly suspected)
+that there would be differences in mean time among races and runners.
+
+```{r cc-lm-anova}
+# Sequential F-tests with null hypothesis of no effect
+anova(mf)
+```
+
+Looking at model summary is difficult due to there being so many runners. 
+
+```{r cc-lm-summary}
+summary(mf)
+```
+
+We can use `emmeans` to obtain estimates for fixed effects. 
+
+```{r cc-lm-races}
+em <- emmeans(mf, ~ race)
+em
+```
+
+```{r cc-lm-cyclones}
+em <- emmeans(mf, ~ NAME)
+em |> 
+  as.data.frame() |>
+  filter(NAME %in% cyclone_athletes) |>
+  arrange(emmean)
+```
+
+#### Linear regression (log)
+
+```{r cc-lm-log-model}
+ml <- lm(log(minutes) ~ race + NAME, data = cc)
+```
+
+```{r cc-lm-log-diagnostics}
+resid_panel(ml)
+```
+While we can run F-tests, 
+these are not so relevant because we already knew (or highly suspected)
+that there would be differences in mean time among races and runners.
+
+```{r cc-lm-log-anova}
+# Sequential F-tests with null hypothesis of no effect
+anova(ml)
+```
+
+Looking at model summary is difficult due to there being so many runners. 
+
+```{r cc-lm-log-summary}
+summary(ml)
+```
+
+We can use `emmeans` to obtain estimates for fixed effects. 
+
+```{r cc-lm-log-races}
+em <- emmeans(ml, ~ race, 
+              type = "response") # needed to get back to original scale
+em
+```
+
+```{r cc-lm-log-cyclones}
+em <- emmeans(ml, ~ NAME,
+              type = "response")
+em |> 
+  as.data.frame() |>
+  filter(NAME %in% cyclone_athletes) |>
+  arrange(response)                     # note the change
+```
+
+#### Mixed effect model
+
+An alternative to using a multiple regression model is to include random 
+effects and therefore use a mixed effect linear regression model. 
+
+```{r cc-lmer-model}
+mr <- lmer(minutes ~ race + (1|NAME), # NAME is a random effect
+           data = cc)
+```
+
+```{r cc-lmer-diagnostics}
+resid_panel(mr)
+```
+While we can run F-tests, 
+these are not so relevant because we already knew (or highly suspected)
+that there would be differences in mean time among races and runners.
+
+```{r cc-lmer-anova}
+# Sequential F-tests with null hypothesis of no effect
+anova(mr)
+```
+
+Looking at model summary is difficult due to there being so many runners. 
+
+```{r cc-lmer-summary}
+summary(mr)
+```
+
+We can use `emmeans` to obtain estimates for fixed effects. 
+
+```{r cc-lmer-races}
+em <- emmeans(mr, ~ race) 
+em
+```
+
+```{r cc-lmer-cyclones}
+em <- ranef(mr)$NAME |>
+  rownames_to_column("NAME") |>
+  mutate(
+    additive = `(Intercept)`
+  )
+
+ggplot(em, 
+       aes(x = additive)) +
+  geom_histogram(bins = 50) +
+  labs(
+    title = "2024 Women's Cross-Country",
+    x = "Additive athlete Effect (mins)"
+  )
+  
+em |> 
+  filter(NAME %in% cyclone_athletes) |>
+  arrange(additive)                     
+```
+
+
+
+#### Mixed effect model (log)
+
+An alternative to using a multiple regression model is to include random 
+effects and therefore use a mixed effect linear regression model. 
+
+```{r cc-lmer-log-model}
+mrl <- lmer(log(minutes) ~ race + (1|NAME), 
+           data = cc)
+```
+
+```{r cc-lmer-log-diagnostics}
+resid_panel(mrl)
+```
+
+While we can run F-tests, 
+these are not so relevant because we already knew (or highly suspected)
+that there would be differences in mean time among races and runners.
+
+```{r cc-lmer-log-anova}
+# Sequential F-tests with null hypothesis of no effect
+anova(mrl)
+```
+
+Looking at model summary is difficult due to there being so many runners. 
+
+```{r cc-lmer-log-summary}
+summary(mrl)
+```
+
+We can use `emmeans` to obtain estimates for fixed effects. 
+
+```{r cc-lmer-log-races}
+em <- emmeans(mrl, ~ race, 
+              type = "response") # needed to get back to original scale
+em
+```
+
+```{r cc-lmer-log-effect}
+em <- ranef(mrl)$NAME |>
+  rownames_to_column("NAME") |>
+  mutate(
+    estimate = `(Intercept)`,
+    multiplicative = exp(estimate)
+  )
+
+ggplot(em, 
+       aes(x = multiplicative)) +
+  geom_histogram(bins = 50) +
+  labs(
+    title = "2024 Women's Cross-Country",
+    x = "Multiplicative Effect"
+  )
+```
+
+The multiplicative effect for Cyclones relative to the ``average'' runner
+is. 
+
+```{r cc-lmer-log-cyclones}
+em |> 
+  filter(NAME %in% cyclone_athletes) |>
+  arrange(multiplicative)                     
+```
+
+If the multiplicative effect is less than 1, 
+then the runner is better than the average runner. 
+
+
+## Summary
+
+In this analysis, we focused on estimating athlete abilities after adjusting
+for differences in event events. 
+The example utilized cross-country and we expect that there will be differences
+from event to event due to hilliness of the course among other reasons. 
+Thus, when comparing athletes who participate in different event, we want to
+compare athletes after adjusting for differences in events. 
+If we do not make these adjustments then athletes who only competed at 
+easy events will look better than athletes who only competed at hard events. 
+
+While we only focused on events and athletes here, 
+we could add additional explanatory variables to our model, 
+e.g. temperature, week of the season, etc. 
+Adding these variables to our models allows us to adjust for these additional
+explanatory variables. 

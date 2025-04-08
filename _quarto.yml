@@ -21,6 +21,9 @@ book:
       - win-tie-loss.qmd
       - chapters/head-to-head/offense-defense-rating.qmd
       - chapters/head-to-head/player-contribution.qmd
+    - part: chapters/free-for-all/free-for-all.qmd
+      chapters:
+      - chapters/free-for-all/time.qmd
     - part: chapters/bracketology/bracketology.qmd
       chapters:
       - chapters/bracketology/expected-score.qmd

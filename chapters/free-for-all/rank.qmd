@@ -1,0 +1,13 @@
+# Rank Models
+
+```{r packages}
+library("tidyverse"); theme_set(theme_bw())
+library("ggResidpanel")
+library("emmeans")
+library("lme4")
+library("DT")
+
+options(width = 120)
+```
+
+Stub for models for rankings.
