@@ -24,6 +24,7 @@ book:
     - part: chapters/free-for-all/free-for-all.qmd
       chapters:
       - chapters/free-for-all/time.qmd
+      - chapters/free-for-all/rank.qmd
     - part: chapters/bracketology/bracketology.qmd
       chapters:
       - chapters/bracketology/expected-score.qmd

@@ -149,16 +149,23 @@ sample_zeta <- function(theta, y) {
   A    <- ncol(zeta)
   
   for (r in 1:R) {
-    # n_attempts to make sure while() loop doesn't go forever
-    n_attempts <- 0
-    while(!check_zeta(zeta[r,], y[r,]) & n_attempts < 10) {
-      zeta[r,] <- rnorm(A, theta, 1)
+    for (a in 1:A) {
+      if (!is.na(y[r,a])) {
+        zeta_below <- ifelse(y[r,a] == 1, 
+                             0, 
+                             zeta[r, which(y[r,] == (y[r,a] - 1))])
+        
+        zeta_above <- ifelse(y[r,a] == max(y[r,], na.rm = TRUE), 
+                             1, 
+                             zeta[r, which(y[r,] == (y[r,a] - 1))])
+        
+        zeta[r, a] <- qnorm(runif(1, min = zeta_below, max = zeta_above), 
+                            mean = theta[a])
+      }
     }
-    n_attempts <- n_attempts + 1
   }
   
-  # Make sure NA entries for y are NA in zeta
-  return(zeta * (y > 0))
+  return(zeta)
 }
 
 #' Sample player abilities based on latent player performances
@@ -170,7 +177,7 @@ sample_zeta <- function(theta, y) {
 #' 
 sample_theta <- function(zeta, sd_A) {
   return(rnorm(ncol(zeta), 
-               mean = colSums(zeta, na.rm = TRUE), 
+               mean = colMeans(zeta, na.rm = TRUE), 
                sd   = sd_A))
 }
 ```
@@ -235,5 +242,5 @@ y <- cc |>
   pivot_wider(names_from = NAME, 
               values_from = rank) 
 
-m <- run_gibbs(y[,-1], 1)
+# m <- run_gibbs(y[,-1])
 ```
