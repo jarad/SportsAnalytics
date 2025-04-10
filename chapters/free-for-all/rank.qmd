@@ -10,4 +10,230 @@ library("DT")
 options(width = 120)
 ```
 
-Stub for models for rankings.
+
+## Models
+
+Let $Y_{a,e}$ be the rank for athlete $a$ in event $e$ with 1 indicating the 
+fastest time and higher numbers indicating slower times.
+To build a model for the ranks, we will introduce a latent variable 
+$\zeta_{a,e}$ with the order statistics 
+$\zeta_{a,e,(1)}, \ldots, \zeta_{a,e,(N_e)}$
+where $N_e$ are the number of athletes in event $e$. 
+The order statistics are such that 
+$$\zeta_{a,e,(1)} < \zeta_{a,e,(2)} < \cdots < \zeta_{a,e,(N_e)}.$$
+We then define the athletes rank in terms of these order statistics to be
+$$Y_{a,e} = \arg_r \{r: \zeta_{a,e} = \zeta_{a,e,(r)}\}.$$
+The latent variable $\zeta_{a,e}$ is related to the time in the event in the 
+sense that if we had the time in the event, we would just use it rather than
+using these $\zeta_{a,e}s$. 
+
+Now, we need to build a model for the $\zeta_{a,e}$ for each athlete. 
+We assume
+$$\zeta_{a,e} \stackrel{ind}{\sim} N(\theta_a, 1).$$
+So the athlete performance at a given event is a draw from a normal distribution
+whose mean is the ability of the athlete. 
+The variance is assumed to be $1$ for identifiability reasons. 
+
+Similar to our models of player/team strengths, the $\theta_a$ are unidentifiable
+because we can add a constant to all the $\theta_a$ without affect the 
+distribution of the ranks. 
+
+### Bayesian approach
+
+In contrast, to the approach we have used previously, we will introduce a
+Bayesian approach that provides *weak* identifiability. 
+We introduce a prior for the $\theta$s, namely
+$$\theta_a \stackrel{ind}{\sim} N(0, 1).$$
+An appealing aspect of this prior is that the $\theta_a$ will now be 
+interpretable as how many standard deviations away from average (0) is an 
+athlete. 
+
+### Gibbs sampling
+
+Many Bayesian techniques estimate parameters using a technique called Gibbs
+sampling. 
+To perform Gibbs sampling, we alternate draws from the following
+*full conditional distributions*:
+
+- $p(\theta|\zeta, y)$
+- $p(\zeta|\theta, y)$
+
+where 
+
+- $\theta = (\theta_1,\ldots,\theta_A)$ where $A$ is the number of athletes,
+- $\zeta = (\zeta_{11}, \zeta_{21}, \ldots, \zeta_{N_11}, \ldots, \zeta_{1R}, \ldots, \zeta_{n_RR})$, and
+- $y = (y_{11}, y_{21}, \ldots, y_{N_11}, \ldots, y_{1R}, \ldots, y_{n_R R})$.
+
+Performing *iterations* of these draws will converge to a collection of draws
+from the *joint posterior distribution*
+$$p(\theta,\zeta|y).$$
+We can take the $\theta= (\theta_1,\ldots,\theta_A)$ draws as our belief
+about that players ability. 
+
+Now, we need to determine what the two full conditional distributions are. 
+Define $\zeta_a = \{\zeta_{a,e}: \zeta_{a,e} \mbox{ exists}\}$ and 
+$n_a = |\zeta_a|$, which is the number of races athlete $a$ is in.
+For the full conditional for $\theta$, we have
+$$p(\theta|\zeta,y) = \prod_{a=1}^A p(\theta_a|\zeta_a) = \prod_{a=1}^A N\left(\theta_a; \bar{\zeta}_a, \frac{1}{1+n_a}\right).$$
+Thus, the $\theta_a$ are all **independent** draws from a normal distribution
+where the mean is the mean of the $\zeta$ values for that athlete and the 
+variance is the inverse of the number of races plus 1 for that athlete. 
+Note that, conditional on the $\zeta$s, the $\theta$s are independent of $y$. 
+
+Define $A_r$ be the set of athletes in race $r$.
+For the full conditional for $\zeta$, 
+we have 
+$$p(\zeta_{\cdot,e}|\theta,y) = \left[\prod_{a \in A_r} N(\zeta_{a,e}; \theta_a, 1) \right] \mathrm{I}\left(y_{a,e,(1)} < \cdots < y_{a,e,(N_r)}\right).$$
+Thus, for each event, we draw the $\zeta$s from independent normals with a 
+mean according to that athlete, but with the requirement that the $\zeta$
+maintain the order observed in the race. 
+
+### Computing
+
+```{r computing}
+#' Construct Gibbs sampler
+#' 
+#' @param y is the observed R x A matrix of ranks
+#' @param n_iter integer, number of iterations to run
+#' 
+#' @return A x (n_iter + 1) matrix of theta (player ability) draws
+run_gibbs <- function(y, n_iter = 10, init = NULL) {
+  R <- nrow(y)
+  A <- ncol(y)
+  
+  # Storage
+  theta <- matrix(NA, nrow = n_iter + 1, ncol = A)
+  colnames(theta) <- colnames(y)
+  
+  # Initial draw
+  if (is.null(init)) {
+    init = sort(rnorm(A)) # if athletes are in order, this helps
+  }
+  theta[1, ] <- init
+  
+  # Precalculate quantities
+  sd_A <- sqrt(1 / (1 + colSums(!is.na(y))))
+  
+  # Iterations
+  for (i in 1:n_iter) {
+    zeta        <- sample_zeta(theta[i, ], y)
+    theta[i+1,] <- sample_theta(zeta, sd_A = sd_A)
+  }
+  
+  return(theta)
+}
+
+#' Check to make sure the zeta are in the correct order according to the ranks
+#' in y
+#' 
+#' @param zeta numeric vector of player abilities
+#' @param y_r integer vector of ranks
+#' 
+#' @return logical indicating if zeta is in the correct order
+check_zeta <- function(zeta, y_r) {
+  all(rank(zeta[!is.na(y_r)]) == y_r[!is.na(y_r)])
+}
+
+# Sample latent performances for each athlete in each race
+#' 
+#' @param theta numeric vector of athlete abilities
+#' @param y integer matrix with athlete ranks in each event, 
+#'   NAs indicate the athelete did not compete
+#'   
+#' @return numeric R x A matrix of player performances in each event
+#' 
+sample_zeta <- function(theta, y) {
+  # Create zeta matrix
+  zeta <- y*0
+  R    <- nrow(zeta)
+  A    <- ncol(zeta)
+  
+  for (r in 1:R) {
+    # n_attempts to make sure while() loop doesn't go forever
+    n_attempts <- 0
+    while(!check_zeta(zeta[r,], y[r,]) & n_attempts < 10) {
+      zeta[r,] <- rnorm(A, theta, 1)
+    }
+    n_attempts <- n_attempts + 1
+  }
+  
+  # Make sure NA entries for y are NA in zeta
+  return(zeta * (y > 0))
+}
+
+#' Sample player abilities based on latent player performances
+#' 
+#' @param zeta numeric R x A matrix of athlete performances, NAs indicate athlete did not perform
+#' @param sd_A numeric vector of pre-calculated standard deviations
+#' 
+#' @return numeric vector of athlete abilities
+#' 
+sample_theta <- function(zeta, sd_A) {
+  return(rnorm(ncol(zeta), 
+               mean = colSums(zeta, na.rm = TRUE), 
+               sd   = sd_A))
+}
+```
+
+
+
+
+
+## Examples
+
+### Iowa State University Women's 2024 Cross-Country 
+
+```{r cc}
+cc <- read_csv("../../data/2024WomensCC.csv") |>
+  mutate(
+    race = factor(race, 
+                  levels = c(
+                    "2024CyclonePreview",
+                    "2024GreenoDirksenCrossCountryInvitational",
+                    "2024NuttycombeInvitationalChampionship",
+                    "2024WisconsinPreNationalsChampionship",
+                    "2024_Big_12_Conference_Cross_Country_Championship",
+                    "2024_NCAA_Division_I_Midwest_Region_Cross_Country_Championships",
+                    "2024_NCAA_Division_I_Cross_Country_Championships"
+                  ))
+  ) |>
+  filter(TEAM == "Iowa State") |>
+  
+  # Create race-specific ranks
+  group_by(race) |>
+  mutate(
+    rank = order(TIME)
+  )
+```
+
+```{r cc-heatmap}
+ggplot(cc, 
+       aes(race, NAME, fill = rank)) +
+  geom_tile()
+  
+```
+
+```{r cc-exploratory-number-of-races}
+cc |> 
+  group_by(NAME) |>
+  summarize(n = n()) |>
+  ggplot(aes(x = n)) +
+  geom_histogram(binwidth = 1) +
+  labs(
+    title = "Iowa State University Women's 2024 Cross-Country",
+    x = "Number of Races"
+  )
+```
+
+```{r cc-gibbs}
+# Construct rank matrix
+y <- cc |>
+  group_by(race) |>
+  mutate(rank = rank(minutes, na.last = "keep")) |>
+  select(race, NAME, rank) |>
+  
+  pivot_wider(names_from = NAME, 
+              values_from = rank) 
+
+m <- run_gibbs(y[,-1], 1)
+```
