@@ -1,5 +1,10 @@
 # Announcements
 
+## 2025-04-10
+
+- Feedback on proposed project today or tomorrow
+- Jarad is out of town next week, but still have class
+
 ## 2025-04-08
 
 - No more homework or discussion board data
