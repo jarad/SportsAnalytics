@@ -1,5 +1,10 @@
 # Announcements
 
+## 2025-04-08
+
+- No more homework or discussion board data
+- Focus on Project
+
 ## 2025-03-27
 
 - Project proposal due today
