@@ -4,7 +4,7 @@ project:
 book:
   title: "Sports Analytics"
   author: "Jarad Niemi"
-  date: "2025-02-28"
+  date: "2025-04-22"
   chapters:
     - index.qmd
     - part: background.qmd
@@ -25,8 +25,9 @@ book:
       chapters:
       - chapters/free-for-all/time.qmd
       - chapters/free-for-all/rank.qmd
-    - part: chapters/missing-data/missing-data.md
-      - chapters/missing-data/informative-missingness.md
+    - part: chapters/missing-data/missing-data.qmd
+      chapters:
+      - chapters/missing-data/informative-missingness.qmd
     - part: chapters/bracketology/bracketology.qmd
       chapters:
       - chapters/bracketology/expected-score.qmd

@@ -240,7 +240,7 @@ cc |>
   )
 ```
 
-```{r cc-gibbs}
+```{r cc-gibbs, eval=FALSE}
 # Construct rank matrix
 y <- cc |>
   group_by(race) |>
