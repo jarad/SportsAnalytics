@@ -1,5 +1,19 @@
 # Announcements
 
+## 2025-04-22
+
+- Feedback on Data 
+- Fitting a Model due on Friday
+- What do you want to do with the rest of semester?
+  - Player impact...WAR
+  - Censored
+  - Strategic decision making (Monte Carlo simulations)
+    - Fouling
+    - Going for it on 4th down
+    - Baseball batting order
+  - JQAS articles
+
+
 ## 2025-04-10
 
 - Feedback on proposed project today or tomorrow
