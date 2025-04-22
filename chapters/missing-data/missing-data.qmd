@@ -1,0 +1,90 @@
+# Missing Data
+
+There are three types of missing data:
+
+- Missing Completely at Random (MCAR)
+- Missing at Random (MAR)
+- Missing Not at Random (MNAR)
+
+## Missing Completely at Random (MCAR)
+
+Data are *missing completely at random (MCAR)* when the probability of the 
+data being missing is unrelated to any data, observed or unobserved. 
+
+Examples are
+
+- data were accidentally recorded for the wrong team
+- a file got corrupted
+
+When data are MCAR, you can ignore the missingness and use standard tencniques.
+The only impact is that your data has a smaller sample size and thus less 
+power than you had original planned. 
+Thus when missing data are MCAR, this is the least problematic.
+
+## Missing at Random (MAR)
+
+Data are *missing at random (MAR)* when the probability of missingness is 
+related to observed data, but not due to the missing data itself. 
+
+Examples are
+
+- injury status is not reported for older players
+- kicker is not asked to kick a field goal due to the distance
+
+When the data are MAR, you can model the missingness based on the
+observed data (explanatory variables or other . 
+
+## Missing Not at Random (MNAR)
+
+Data are *missing not at random (MNAR)* when the probability of missingness 
+depends on the value of the missing data itself. 
+
+Examples are
+
+- salaries that are too high or too low are not reported
+- a player underreports training load to avoid being rested
+
+When the data are MNAR, you will need to model the missingness directly and
+your inferences about the quantities you care about will depend on the 
+assumptions you make in the missingness models.
+Thus, MNAR data are the most challenging to deal of the missingness types.
+
+Two types of MNAR data that are extremely common are censoring and truncation.
+
+### Censoring
+
+Data are *censored* when you know the data exists, but you only know a range
+for the data. 
+There are types of censored data:
+
+- right censored
+- left censored
+- interval censored
+
+Data are *right censored* when you know the data are above a certain value. 
+Examples are salary is $100,000+, marathon time is greater than some time 
+when the runner drops out, and career duration is at least X years.
+
+Data are *left censored* when you know the data are below a certain value.
+Examples are reaction time when your test has limit of 0.2s and someone reacts
+in less than that amount of time and you start recording data after an 
+event/career has started.
+
+Data are *interval censored* when you know the data are within an interval.
+Examples a periodic testing that report where you know something occurred 
+between the tests but not precisely when it occurred and an injury occurs 
+between two games but it is not precisely known when between those two games.
+
+### Truncation
+
+Data are *truncated* when there is no reporting data outside of some limits. 
+In these situations, you will not know if data outside of these limits even
+exists or how many data points there are outside of those limits. 
+Examples are marathon data only reporting the top 20 runners, players will only
+be included in an analysis if they have played 10 games, and
+reactions times above a limit are excluded from the data set.
+
+## Summary
+
+Censored data needs to be dealt with carefully. 
+It is not simply enough to say "I think the data are MCAR and proceed as normal."

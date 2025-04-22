@@ -25,6 +25,8 @@ book:
       chapters:
       - chapters/free-for-all/time.qmd
       - chapters/free-for-all/rank.qmd
+    - part: chapters/missing-data/missing-data.md
+      - chapters/missing-data/informative-missingness.md
     - part: chapters/bracketology/bracketology.qmd
       chapters:
       - chapters/bracketology/expected-score.qmd
