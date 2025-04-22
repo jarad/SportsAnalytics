@@ -74,7 +74,10 @@ Now, we need to determine what the two full conditional distributions are.
 Define $\zeta_a = \{\zeta_{a,e}: \zeta_{a,e} \mbox{ exists}\}$ and 
 $n_a = |\zeta_a|$, which is the number of races athlete $a$ is in.
 For the full conditional for $\theta$, we have
-$$p(\theta|\zeta,y) = \prod_{a=1}^A p(\theta_a|\zeta_a) = \prod_{a=1}^A N\left(\theta_a; \bar{\zeta}_a, \frac{1}{1+n_a}\right).$$
+$$p(\theta|\zeta,y) = \prod_{a=1}^A p(\theta_a|\zeta_a) = \prod_{a=1}^A N\left(\theta_a; \bar{\zeta}_a, \frac{1}{1+n_a}\right)$$
+where $\bar{\zeta}_a$ is the average of the $\zeta$ values for athlete $a$
+across all the races they competed in.
+
 Thus, the $\theta_a$ are all **independent** draws from a normal distribution
 where the mean is the mean of the $\zeta$ values for that athlete and the 
 variance is the inverse of the number of races plus 1 for that athlete. 
@@ -149,17 +152,22 @@ sample_zeta <- function(theta, y) {
   A    <- ncol(zeta)
   
   for (r in 1:R) {
+    max_rank <- max(y[r,], na.rm = TRUE)
     for (a in 1:A) {
       if (!is.na(y[r,a])) {
-        zeta_below <- ifelse(y[r,a] == 1, 
-                             0, 
-                             zeta[r, which(y[r,] == (y[r,a] - 1))])
+        rnk <- y[r,a]
+        zeta_below <- ifelse(y[r, a] == 1, 
+                             -Inf, 
+                             zeta[r, which(y[r,] == (rnk - 1) )])
         
-        zeta_above <- ifelse(y[r,a] == max(y[r,], na.rm = TRUE), 
-                             1, 
-                             zeta[r, which(y[r,] == (y[r,a] - 1))])
+        zeta_above <- ifelse(y[r, a] == max_rank, 
+                             Inf, 
+                             zeta[r, which(y[r,] == (rnk + 1) )])
         
-        zeta[r, a] <- qnorm(runif(1, min = zeta_below, max = zeta_above), 
+        # Sample zeta[r,a] ~ N(theta[a], 1) in (zeta_below, zeta_above)
+        zeta[r, a] <- qnorm(runif(1, 
+                                  min = pnorm(zeta_below, mean = theta[a]), 
+                                  max = pnorm(zeta_above, mean = theta[a])), 
                             mean = theta[a])
       }
     }
@@ -242,5 +250,5 @@ y <- cc |>
   pivot_wider(names_from = NAME, 
               values_from = rank) 
 
-# m <- run_gibbs(y[,-1])
+m <- run_gibbs(y[,-1])
 ```
