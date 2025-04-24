@@ -1,0 +1,337 @@
+# Tournament
+
+```{r packages}
+library("tidyverse"); theme_set(theme_bw())
+library("ggResidpanel")
+library("emmeans")
+library("lme4")
+library("DT")
+
+options(width = 120)
+
+source("../../R/construct_matrix.R")
+```
+
+## FIRST Robotics Challenge (FRC) 2025 World Championships Hopper Division
+
+### Qualifications
+
+```{r champs2025hopper-data}
+tmp <- read_csv("../../data/frc/2025_champs_hopper_division.csv")  
+
+# Create factor for all teams
+teams <- tmp |>
+  select(`Red 1`:`Blue 3`) |>
+  pivot_longer(everything()) |>
+  pull(value) |>
+  unique() |>
+  sort()
+
+champs2025hopper <- tmp |>
+  mutate(
+    `Red 1`  = factor(`Red 1`,  levels = teams),
+    `Red 2`  = factor(`Red 2`,  levels = teams),
+    `Red 3`  = factor(`Red 3`,  levels = teams),
+    `Blue 1` = factor(`Blue 1`, levels = teams),
+    `Blue 2` = factor(`Blue 2`, levels = teams),
+    `Blue 3` = factor(`Blue 3`, levels = teams)
+  )
+
+nteams <- length(teams)
+```
+
+```{r champs2025hopper-matrices}
+# Construct model matrices
+X_red <- 
+  construct_matrix(champs2025hopper, "Red 1", nteams) +
+  construct_matrix(champs2025hopper, "Red 2", nteams) +
+  construct_matrix(champs2025hopper, "Red 3", nteams) 
+
+X_blue <- 
+  construct_matrix(champs2025hopper, "Blue 1", nteams) +
+  construct_matrix(champs2025hopper, "Blue 2", nteams) +
+  construct_matrix(champs2025hopper, "Blue 3", nteams) 
+
+# Checks
+table(rowSums(X_red))
+colSums(X_red) + colSums(X_blue)
+```
+
+```{r champs2025hopper-margin-analysis}
+# Margin of victory
+margin <- champs2025hopper$`Red Final` - champs2025hopper$`Blue Final`
+X      <- X_red - X_blue
+
+# Fit model
+m <- lm(margin ~ 0 + X)
+(sd <- summary(m)$sigma)
+
+# Calculate team rating
+champs2025hopper_margin <- data.frame(
+  team   = teams,
+  rating = coef(m)
+) |>
+  mutate(
+    rating = ifelse(is.na(rating), 0, rating),
+    rating = rating - mean(rating),
+    team   = factor(team, levels = team[order(rating)])
+  ) |>
+  arrange(desc(team))
+
+champs2025hopper_margin |> 
+  datatable(filter = "top", 
+            rownames = FALSE) |>
+  formatRound(columns = "rating", digits = 1)
+```
+
+Let's plot the teams
+
+```{r champs2025hopper-margin-plot, fig.height=10}
+ggplot(champs2025hopper_margin,
+       aes(
+         x = rating,
+         y = team
+       )) +
+  geom_bar(stat="identity", aes(fill = team == "3928")) +
+  theme(legend.position = NULL) +
+  labs(
+    x = "Rating",
+    y = "Team",
+    title = "2025 World Championship",
+    subtitle = "Hopper Division"
+  )
+```
+
+### Playoffs
+
+
+```{r playoff-alliances}
+alliance <- tribble(
+  ~number, ~team1, ~team2, ~team3, ~team4,
+  1, 1768, 2767, 2877, 4145,
+  2, 2200, 3339, 1153, 2491,
+  3, 4728, 3970, 3045, 8570,
+  4, 6621, 9450, 2539,  230,
+  5, 9245,   33,  195, 1506,
+  6, 4907, 9496, 6324, 3656,
+  7, 7632, 1241, 3197,   51,
+  8, 2075,  973, 2522, 1902
+) |>
+  mutate(
+    team1 = factor(team1, levels = teams),
+    team2 = factor(team2, levels = teams),
+    team3 = factor(team3, levels = teams),
+    team4 = factor(team4, levels = teams),
+    
+    strength = 
+      champs2025hopper_margin$rating[as.numeric(team1)] +
+      champs2025hopper_margin$rating[as.numeric(team2)] +
+      champs2025hopper_margin$rating[as.numeric(team3)] 
+  ) 
+
+alliance
+```
+
+```{r playoff-probabilities}
+probability <- matrix(NA, 8, 8)
+
+for (r in 1:8) {
+  for (c in 1:8) {
+    probability[r,c] <- 1 - pnorm(
+      0, 
+      mean = alliance$strength[r] - alliance$strength[c],
+      sd   = sd
+    )
+  }
+}
+diag(probability) <- NA
+
+probability |> round(3)
+```
+
+```{r playoff-structure}
+match <- tribble(
+  ~number, ~red, ~blue, 
+  1, 1, 8,
+  2, 4, 5,
+  3, 2, 7,
+  4, 3, 6
+)
+```
+
+```{r playoff-simulation}
+simulate_playoffs <- function(probability, sim) {
+  # Match 1
+  u1 <- runif(1)
+  match1_winner <- ifelse(u1 < probability[1,8], 1, 8)
+  match1_loser  <- ifelse(u1 < probability[1,8], 8, 1)
+  
+  # Match 2
+  u2 <- runif(1)
+  match2_winner <- ifelse(u2 < probability[4,5], 4, 5)
+  match2_loser  <- ifelse(u2 < probability[4,5], 5, 4)
+  
+  # Match 3
+  u3 <- runif(1)
+  match3_winner <- ifelse(u3 < probability[2,7], 2, 7)
+  match3_loser  <- ifelse(u3 < probability[2,7], 7, 2)
+  
+  # Match 4
+  u4 <- runif(1)
+  match4_winner <- ifelse(u4 < probability[3,6], 3, 6)
+  match4_loser  <- ifelse(u4 < probability[3,6], 6, 3)
+  
+  # Match 5
+  u5 <- runif(1)
+  match5_winner <- ifelse(u5 < probability[match1_loser, match2_loser], match1_loser, match2_loser)
+  exit_round <- data.frame(
+    number = ifelse(u5 < probability[match1_loser, match2_loser], match2_loser, match1_loser),
+    round = 2
+  )
+                             
+  
+  # Match 6
+  u6 <- runif(1)
+  match6_winner <- ifelse(u6 < probability[match3_loser, match4_loser], match3_loser, match4_loser)
+  exit_round <- exit_round |>
+    rbind(data.frame(
+    number = ifelse(u6 < probability[match3_loser, match4_loser], match4_loser, match3_loser),
+    round = 2
+  ))
+  
+  # Match 7
+  u7 <- runif(1)
+  match7_winner <- ifelse(u7 < probability[match1_winner, match2_winner], match1_winner, match2_winner)
+  match7_loser  <- ifelse(u7 < probability[match1_winner, match2_winner], match2_winner, match1_winner)
+  
+  # Match 8
+  u8 <- runif(1)
+  match8_winner <- ifelse(u8 < probability[match3_winner, match4_winner], match3_winner, match4_winner)
+  match8_loser  <- ifelse(u8 < probability[match3_winner, match4_winner], match4_winner, match3_winner)
+  
+  # Match 9
+  u9 <- runif(1)
+  match9_winner <- ifelse(u9 < probability[match6_winner, match7_loser], match6_winner, match7_loser)
+  exit_round <- exit_round |>
+    rbind(data.frame(
+    number = ifelse(u9 < probability[match6_winner, match7_loser], match7_loser, match6_winner),
+    round = 3
+  ))
+  
+  # Match 10
+  u10 <- runif(1)
+  match10_winner <- ifelse(u10 < probability[match5_winner, match8_loser], match5_winner, match8_loser)
+  exit_round <- exit_round |>
+    rbind(data.frame(
+    number = ifelse(u10 < probability[match5_winner, match8_loser], match8_loser, match5_winner),
+    round = 3
+  ))
+  
+  
+  # Match 11
+  u11 <- runif(1)
+  match11_winner <- ifelse(u11 < probability[match7_winner, match8_winner], match7_winner, match8_winner)
+  match11_loser  <- ifelse(u11 < probability[match7_winner, match8_winner], match8_winner, match7_winner)
+  
+  # Match 12
+  u12 <- runif(1)
+  match12_winner <- ifelse(u12 < probability[match10_winner, match9_winner], match10_winner, match9_winner)
+  exit_round <- exit_round |>
+    rbind(data.frame(
+    number = ifelse(u12 < probability[match10_winner, match9_winner], match9_winner, match10_winner),
+    round = 4
+  ))
+  
+  # Match 13
+  u13 <- runif(1)
+  match13_winner <- ifelse(u13 < probability[match12_winner, match11_loser], match12_winner, match11_loser)
+  exit_round <- exit_round |>
+    rbind(data.frame(
+    number = ifelse(u13 < probability[match12_winner, match11_loser], match11_loser, match12_winner),
+    round = 5
+  ))
+  
+  # Finals
+  uf_1 <- runif(1)
+  final_game1_w <- ifelse(uf_1 < probability[match11_winner, match13_winner], match11_winner, match13_winner)
+  uf_2 <- runif(1)
+  final_game2_w <- ifelse(uf_2 < probability[match11_winner, match13_winner], match11_winner, match13_winner)
+  if (!(final_game1_w == final_game2_w)) {
+    uf_3 <- runif(1)
+    final_game3_w <- ifelse(uf_3 < probability[match11_winner, match13_winner], match11_winner, match13_winner)
+  }
+  winner   <- ifelse(!exists("final_game3_w"), final_game2_w, final_game3_w)
+  runnerup <- setdiff(c(match11_winner, match13_winner), winner)
+  
+  exit_round <- exit_round |>
+    rbind(data.frame(
+    number = c(runnerup, winner),
+    round = c(6,7)
+  ))
+  
+  exit_round$sim = sim
+  return(exit_round)
+}
+
+
+# Large number of simulations
+n_sims <- 1000
+
+exit_round <- list()
+for (i in 1:n_sims) {
+  exit_round[[i]] <- simulate_playoffs(probability, i)
+}
+
+exits <- bind_rows(exit_round) |> 
+  select(sim, round, number) |> 
+  arrange(sim, round, number)
+```
+
+
+Calculate probability of winning the tournament with uncertainty. 
+
+```{r probability-winning-tournament}
+p <- exits |>
+  filter(round == 7) |>
+  group_by(number) |>
+  summarize(n = n(), .groups = "drop") |>
+  mutate(p = n / n_sims,
+         lcl = p - 2 * sqrt(p*(1-p)/n),
+         ucl = p + 2 * sqrt(p*(1-p)/n)) |>
+  arrange(desc(p))
+
+p
+```
+
+Calculate expected points. 
+
+```{r expected-points-tournament}
+points <- exits |>
+  mutate(
+    points = case_when(
+      round == 7 ~ 30,
+      round == 6 ~ 15,
+      round == 5 ~ 10,
+      round == 4 ~  5,
+      round == 3 ~  3,
+      round == 2 ~  1
+    )
+  ) |>
+  group_by(number) |>
+  summarize(
+    mean = mean(points),
+    sd   = sd(points),
+    n    = n(),
+    .groups = "drop"
+  ) |>
+  mutate(
+    lcl = mean - 2 * sd / sqrt(n),
+    ucl = mean + 2 * sd / sqrt(n)
+  )
+
+points |> arrange(desc(mean))
+  
+```
+
+
+These simulations depend largely on your probability model. 

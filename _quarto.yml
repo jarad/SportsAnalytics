@@ -28,6 +28,9 @@ book:
     - part: chapters/missing-data/missing-data.qmd
       chapters:
       - chapters/missing-data/informative-missingness.qmd
+    - part: chapters/monte-carlo/monte-carlo.qmd
+      chapters:
+      - chapters/monte-carlo/tournament.qmd
     - part: chapters/bracketology/bracketology.qmd
       chapters:
       - chapters/bracketology/expected-score.qmd
