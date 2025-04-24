@@ -1,3 +1,4 @@
 # Monte Carlo
  
-Stub
+Read the [simulate section](https://statisticalcomputing.netlify.app/chapters/simulate) which includes
+[interval estimators](https://statisticalcomputing.netlify.app/chapters/simulate-intervals) of probabilities and expectations.
