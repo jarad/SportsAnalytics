@@ -1,5 +1,9 @@
 # Announcements
 
+## 2025-04-24
+
+- Fitting a Model due on Friday
+
 ## 2025-04-22
 
 - Feedback on Data 
