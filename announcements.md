@@ -1,5 +1,11 @@
 # Announcements
 
+
+## 2025-05-06
+
+- Poster due tomorrow (so that we can get it printed)
+- Report due next Wednesday 
+
 ## 2025-04-24
 
 - Fitting a Model due on Friday
